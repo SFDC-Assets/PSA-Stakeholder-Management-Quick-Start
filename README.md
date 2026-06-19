@@ -2,7 +2,7 @@
 
 # Stakeholder Management Quick Start
 
-Accelerator Listing: [tbd](https://gpsaccelerators.developer.salesforce.com/) (tbd once published)
+[Accelerator Listing](https://gpsaccelerators.developer.salesforce.com/accelerator/a0wDo000001PNyLIAW/stakeholder-management-quick-start)
 
 
 ## Description
