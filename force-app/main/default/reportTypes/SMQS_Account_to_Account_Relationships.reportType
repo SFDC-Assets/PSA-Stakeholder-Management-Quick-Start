@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <baseObject>AccountAccountRelation</baseObject>
+    <category>accounts</category>
+    <deployed>true</deployed>
+    <description>Account to Account Relationships (organizations/households)</description>
+    <label>SMQS Group Affiliations (Account Account Relationships)</label>
+    <sections>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account</displayNameOverride>
+            <field>Account</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship ID</displayNameOverride>
+            <field>Id</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <displayNameOverride>Account Relationship Id</displayNameOverride>
+            <field>Name</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Active</displayNameOverride>
+            <field>IsActive</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Created By</displayNameOverride>
+            <field>CreatedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Created Date</displayNameOverride>
+            <field>CreatedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>StartDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>End Date</displayNameOverride>
+            <field>EndDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Hierarchy Type</displayNameOverride>
+            <field>HierarchyType</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Last Modified By</displayNameOverride>
+            <field>LastModifiedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Last Modified Date</displayNameOverride>
+            <field>LastModifiedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Party Role Relationship</displayNameOverride>
+            <field>PartyRoleRelation</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Related Account</displayNameOverride>
+            <field>RelatedAccount</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Related Inverse Record</displayNameOverride>
+            <field>RelatedInverseRecord</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Party Role Relationship : Related Role Name</displayNameOverride>
+            <field>PartyRoleRelation.RelatedRoleName</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Party Role Relationship : Role Name</displayNameOverride>
+            <field>PartyRoleRelation.RoleName</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Explanation__c</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>External_ID__c</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <masterLabel>Account Account Relationships</masterLabel>
+    </sections>
+    <sections>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account ID</displayNameOverride>
+            <field>Account.Id</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Created Date</displayNameOverride>
+            <field>Account.CreatedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping Street</displayNameOverride>
+            <field>Account.ShippingStreet</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Description</displayNameOverride>
+            <field>Account.Description</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping State/Province</displayNameOverride>
+            <field>Account.ShippingState</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account Number</displayNameOverride>
+            <field>Account.AccountNumber</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account Owner</displayNameOverride>
+            <field>Account.Owner</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account Site</displayNameOverride>
+            <field>Account.Site</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing State/Province</displayNameOverride>
+            <field>Account.BillingState</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing Street</displayNameOverride>
+            <field>Account.BillingStreet</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Industry</displayNameOverride>
+            <field>Account.Industry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Last Activity</displayNameOverride>
+            <field>Account.LastActivityDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Rating</displayNameOverride>
+            <field>Account.Rating</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping Address</displayNameOverride>
+            <field>Account.ShippingAddress</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Type</displayNameOverride>
+            <field>Account.Type</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Website</displayNameOverride>
+            <field>Account.Website</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account Source</displayNameOverride>
+            <field>Account.AccountSource</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Annual Revenue</displayNameOverride>
+            <field>Account.AnnualRevenue</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing City</displayNameOverride>
+            <field>Account.BillingCity</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing Country</displayNameOverride>
+            <field>Account.BillingCountry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing Zip/Postal Code</displayNameOverride>
+            <field>Account.BillingPostalCode</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Created By</displayNameOverride>
+            <field>Account.CreatedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Employees</displayNameOverride>
+            <field>Account.NumberOfEmployees</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Fax</displayNameOverride>
+            <field>Account.Fax</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Last Modified By</displayNameOverride>
+            <field>Account.LastModifiedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Last Modified Date</displayNameOverride>
+            <field>Account.LastModifiedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Parent Account</displayNameOverride>
+            <field>Account.Parent</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Phone</displayNameOverride>
+            <field>Account.Phone</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping City</displayNameOverride>
+            <field>Account.ShippingCity</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping Country</displayNameOverride>
+            <field>Account.ShippingCountry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Shipping Zip/Postal Code</displayNameOverride>
+            <field>Account.ShippingPostalCode</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Ticker Symbol</displayNameOverride>
+            <field>Account.TickerSymbol</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Billing Address</displayNameOverride>
+            <field>Account.BillingAddress</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Account Record Type</displayNameOverride>
+            <field>Account.RecordType</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Account : Ownership</displayNameOverride>
+            <field>Account.Ownership</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <masterLabel>Primary Account</masterLabel>
+    </sections>
+    <sections>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account ID</displayNameOverride>
+            <field>RelatedAccount.Id</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account Number</displayNameOverride>
+            <field>RelatedAccount.AccountNumber</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account Site</displayNameOverride>
+            <field>RelatedAccount.Site</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account Source</displayNameOverride>
+            <field>RelatedAccount.AccountSource</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing City</displayNameOverride>
+            <field>RelatedAccount.BillingCity</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing Country</displayNameOverride>
+            <field>RelatedAccount.BillingCountry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing Zip/Postal Code</displayNameOverride>
+            <field>RelatedAccount.BillingPostalCode</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Created By</displayNameOverride>
+            <field>RelatedAccount.CreatedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Employees</displayNameOverride>
+            <field>RelatedAccount.NumberOfEmployees</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Fax</displayNameOverride>
+            <field>RelatedAccount.Fax</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Last Modified By</displayNameOverride>
+            <field>RelatedAccount.LastModifiedBy</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Last Modified Date</displayNameOverride>
+            <field>RelatedAccount.LastModifiedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Parent Account</displayNameOverride>
+            <field>RelatedAccount.Parent</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Phone</displayNameOverride>
+            <field>RelatedAccount.Phone</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping City</displayNameOverride>
+            <field>RelatedAccount.ShippingCity</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping Country</displayNameOverride>
+            <field>RelatedAccount.ShippingCountry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping Zip/Postal Code</displayNameOverride>
+            <field>RelatedAccount.ShippingPostalCode</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Ticker Symbol</displayNameOverride>
+            <field>RelatedAccount.TickerSymbol</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account Owner</displayNameOverride>
+            <field>RelatedAccount.Owner</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Account Record Type</displayNameOverride>
+            <field>RelatedAccount.RecordType</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing State/Province</displayNameOverride>
+            <field>RelatedAccount.BillingState</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing Street</displayNameOverride>
+            <field>RelatedAccount.BillingStreet</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Industry</displayNameOverride>
+            <field>RelatedAccount.Industry</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Last Activity</displayNameOverride>
+            <field>RelatedAccount.LastActivityDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Rating</displayNameOverride>
+            <field>RelatedAccount.Rating</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Annual Revenue</displayNameOverride>
+            <field>RelatedAccount.AnnualRevenue</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Description</displayNameOverride>
+            <field>RelatedAccount.Description</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping Street</displayNameOverride>
+            <field>RelatedAccount.ShippingStreet</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping Address</displayNameOverride>
+            <field>RelatedAccount.ShippingAddress</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Type</displayNameOverride>
+            <field>RelatedAccount.Type</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Website</displayNameOverride>
+            <field>RelatedAccount.Website</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Billing Address</displayNameOverride>
+            <field>RelatedAccount.BillingAddress</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Created Date</displayNameOverride>
+            <field>RelatedAccount.CreatedDate</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Ownership</displayNameOverride>
+            <field>RelatedAccount.Ownership</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Account Account Relationship : Related Account : Shipping State/Province</displayNameOverride>
+            <field>RelatedAccount.ShippingState</field>
+            <table>AccountAccountRelation</table>
+        </columns>
+        <masterLabel>Related Account</masterLabel>
+    </sections>
+</ReportType>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Explanation__c</fullName>
+        <externalId>false</externalId>
+        <formula>Account.Name&amp;&quot; is &quot;&amp; RelatedAccount.Name &amp;&quot;&apos;s &quot;&amp; IF(IsActive,&quot;&quot;,&quot;former &quot;)&amp;Lower(PartyRoleRelation.RoleName)&amp;&quot;.&quot;&amp; BR() &amp;
+BR() &amp;
+RelatedAccount.Name&amp;&quot; is &quot;&amp;Account.Name &amp;&quot;&apos;s &quot;&amp; IF(IsActive,&quot;&quot;,&quot;former &quot;)&amp; Lower(PartyRoleRelation.RelatedRoleName)&amp;&quot;.&quot;</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Explanation</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>External_ID__c</fullName>
+        <caseSensitive>false</caseSensitive>
+        <externalId>true</externalId>
+        <label>External ID</label>
+        <length>50</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>true</unique>
+    </fields>
+</CustomObject>

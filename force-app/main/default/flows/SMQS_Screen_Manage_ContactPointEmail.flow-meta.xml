@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <apiVersion>66.0</apiVersion>
+    <assignments>
+        <description>Stamps the shared IsPrimary and Invalid Reason values from Screen_Edit_Multi onto the current loop record (Loop_Apply_Multi), then adds it to var_EmailsToUpdate. Runs once per selected record. After all iterations, Update_Emails performs the DML save.</description>
+        <name>Assign_Apply_Multi</name>
+        <label>Stamp Values on Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Loop_Apply_Multi.IsPrimary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_Multi_IsPrimary</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Loop_Apply_Multi.Invalid_Reason__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_Multi_Invalid_Reason</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_EmailsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Apply_Multi</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Apply_Multi</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Stamps the edited field values from Screen_Edit_Single onto var_SingleEmail, adds it to the var_EmailsToUpdate collection, then proceeds to Update_Emails for the DML save.</description>
+        <name>Assign_Apply_Single</name>
+        <label>Apply Single Record Changes</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_SingleEmail.EmailAddress</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_EmailAddress</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_SingleEmail.IsPrimary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_IsPrimary</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_SingleEmail.UsageType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_UsageType</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_SingleEmail.Invalid_Reason__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>field_Invalid_Reason</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_EmailsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>var_SingleEmail</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Emails</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Captures the single selected record into var_SingleEmail so Screen_Edit_Single can pre-populate all fields. Loop_Capture_Single iterates var_SelectedEmails once; this assignment fires on that one iteration and stores the record, then routes to Screen_Edit_Single.</description>
+        <name>Assign_Capture_Single</name>
+        <label>Capture Single Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_SingleEmail</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Capture_Single</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Screen_Edit_Single</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Counts the records the user selected in the data table and stores the result in var_Count. var_Count is evaluated by Decision_Route_by_Count to route to the single-record or multi-record edit screen.</description>
+        <name>Count_Selected_Emails</name>
+        <label>Count Selected Emails</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_Count</assignToReference>
+            <operator>AssignCount</operator>
+            <value>
+                <elementReference>var_SelectedEmails</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Decision_Route_by_Count</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Routes based on var_Count. If exactly 1 record was selected, routes to Loop_Capture_Single which populates var_SingleEmail before showing Screen_Edit_Single with all fields pre-populated. If more than 1, routes to Screen_Edit_Multi where only IsPrimary and Invalid Reason are editable and applied uniformly to all selected records.</description>
+        <name>Decision_Route_by_Count</name>
+        <label>Single or Multiple Records?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Screen_Edit_Multi</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Multiple Records</defaultConnectorLabel>
+        <rules>
+            <name>Is_Single</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_Count</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <numberValue>1.0</numberValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Capture_Single</targetReference>
+            </connector>
+            <label>Single Record</label>
+        </rules>
+    </decisions>
+    <description>Screen flow on the Account record page to manage ContactPointEmail records. Select one or more records to edit. Sync flows handle downstream Account field updates.</description>
+    <dynamicChoiceSets>
+        <name>dcs_Invalid_Reason</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>Invalid_Reason__c</picklistField>
+        <picklistObject>ContactPointEmail</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>dcs_UsageType</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>UsageType</picklistField>
+        <picklistObject>ContactPointEmail</picklistObject>
+    </dynamicChoiceSets>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Manage ContactPointEmail {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Screen Manage ContactPointEmail</label>
+    <loops>
+        <description>Iterates over each record in var_SelectedEmails. For each iteration, Assign_Apply_Multi stamps the shared IsPrimary and Invalid Reason values from Screen_Edit_Multi and adds the record to var_EmailsToUpdate. After all iterations, Update_Emails performs the DML save.</description>
+        <name>Loop_Apply_Multi</name>
+        <label>Apply to Each Selected Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_SelectedEmails</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Apply_Multi</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Update_Emails</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Iterates var_SelectedEmails exactly once (only reached when var_Count = 1). The single iteration fires Assign_Capture_Single to store the record in var_SingleEmail, which then routes to Screen_Edit_Single with all fields pre-populated.</description>
+        <name>Loop_Capture_Single</name>
+        <label>Capture Single Selected Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_SelectedEmails</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Capture_Single</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Screen_Edit_Single</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordLookups>
+        <description>Retrieves all ContactPointEmail records for this Account (filtered by ParentId = recordId). Results are stored in var_AllEmails and bound to the data table on Screen_Select so the user can select records to edit.</description>
+        <name>Get_Email_Records</name>
+        <label>Get Email Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Screen_Select</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ParentId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <object>ContactPointEmail</object>
+        <outputReference>var_AllEmails</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>EmailAddress</queriedFields>
+        <queriedFields>IsPrimary</queriedFields>
+        <queriedFields>UsageType</queriedFields>
+        <queriedFields>Invalid_Reason__c</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Performs a single DML update on all records in var_EmailsToUpdate (either one record from the single path or multiple from the multi path). On success, routes to Screen_Success. On fault, routes to Screen_Error where the system fault message is displayed.</description>
+        <name>Update_Emails</name>
+        <label>Update Email Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Screen_Success</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Screen_Error</targetReference>
+        </faultConnector>
+        <inputReference>var_EmailsToUpdate</inputReference>
+    </recordUpdates>
+    <screens>
+        <description>Edit screen shown when multiple records were selected. Only IsPrimary and Invalid Reason are editable — these values are applied uniformly to all selected records by Loop_Apply_Multi. On Next, Loop_Apply_Multi iterates and stamps values, then Update_Emails saves.</description>
+        <name>Screen_Edit_Multi</name>
+        <label>Edit Selected Email Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Loop_Apply_Multi</targetReference>
+        </connector>
+        <fields>
+            <name>Screen_Edit_Multi_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Screen_Edit_Multi_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>DisplayTextSpacer2</name>
+                    <fieldText>&lt;p&gt; &lt;/p&gt;</fieldText>
+                    <fieldType>DisplayText</fieldType>
+                </fields>
+                <fields>
+                    <name>field_Multi_IsPrimary</name>
+                    <dataType>Boolean</dataType>
+                    <fieldText>Primary</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Screen_Edit_Multi_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>field_Multi_Invalid_Reason</name>
+                    <choiceReferences>dcs_Invalid_Reason</choiceReferences>
+                    <dataType>String</dataType>
+                    <fieldText>Invalid Reason</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
+            <regionContainerType>SectionWithoutHeader</regionContainerType>
+        </fields>
+        <nextOrFinishButtonLabel>Save Records</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <description>Edit screen shown when exactly one record was selected. All fields are pre-populated from var_SingleEmail. EmailAddress is read-only (shown for context). On Next, Assign_Apply_Single stamps all values onto var_SingleEmail and adds it to var_EmailsToUpdate.</description>
+        <name>Screen_Edit_Single</name>
+        <label>Edit Email Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Assign_Apply_Single</targetReference>
+        </connector>
+        <fields>
+            <name>Screen_Edit_Single_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Screen_Edit_Single_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>field_EmailAddress</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>var_SingleEmail.EmailAddress</elementReference>
+                    </defaultValue>
+                    <fieldText>Email Address</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isReadOnly>
+                        <booleanValue>true</booleanValue>
+                    </isReadOnly>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>field_UsageType</name>
+                    <choiceReferences>dcs_UsageType</choiceReferences>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>var_SingleEmail.UsageType</elementReference>
+                    </defaultValue>
+                    <fieldText>Usage Type</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Screen_Edit_Single_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>DisplayTextSpacer</name>
+                    <fieldText>&lt;p&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;  &lt;/span&gt;&lt;/p&gt;</fieldText>
+                    <fieldType>DisplayText</fieldType>
+                </fields>
+                <fields>
+                    <name>field_IsPrimary</name>
+                    <dataType>Boolean</dataType>
+                    <defaultValue>
+                        <elementReference>var_SingleEmail.IsPrimary</elementReference>
+                    </defaultValue>
+                    <fieldText>Primary</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>field_Invalid_Reason</name>
+                    <choiceReferences>dcs_Invalid_Reason</choiceReferences>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>var_SingleEmail.Invalid_Reason__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Invalid Reason</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
+            <regionContainerType>SectionWithoutHeader</regionContainerType>
+        </fields>
+        <nextOrFinishButtonLabel>Save Record</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <description>Displays a fault message if Update_Emails encounters a DML error. The user can dismiss the flow from this screen.</description>
+        <name>Screen_Error</name>
+        <label>Error</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>txt_Error</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;An error occurred while saving.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <description>Displays all ContactPointEmail records for this Account in a multi-select data table. The user selects one or more records to edit and clicks Edit Selected. Selected rows are stored in var_SelectedEmails, which feeds Count_Selected_Emails and then either the single-record or multi-record edit screen.</description>
+        <name>Screen_Select</name>
+        <label>Select Email Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Count_Selected_Emails</targetReference>
+        </connector>
+        <fields>
+            <name>dt_Emails</name>
+            <dataTypeMappings>
+                <typeName>T</typeName>
+                <typeValue>ContactPointEmail</typeValue>
+            </dataTypeMappings>
+            <extensionName>flowruntime:datatable</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Email Records</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>tableData</name>
+                <value>
+                    <elementReference>var_AllEmails</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>columns</name>
+                <value>
+                    <stringValue>[{&quot;label&quot;:&quot;Email Address&quot;,&quot;fieldName&quot;:&quot;EmailAddress&quot;,&quot;type&quot;:&quot;email&quot;},{&quot;label&quot;:&quot;Primary&quot;,&quot;fieldName&quot;:&quot;IsPrimary&quot;,&quot;type&quot;:&quot;boolean&quot;},{&quot;label&quot;:&quot;Usage Type&quot;,&quot;fieldName&quot;:&quot;UsageType&quot;,&quot;type&quot;:&quot;text&quot;},{&quot;label&quot;:&quot;Invalid Reason&quot;,&quot;fieldName&quot;:&quot;Invalid_Reason__c&quot;,&quot;type&quot;:&quot;text&quot;}]</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>minRowSelection</name>
+                <value>
+                    <numberValue>1.0</numberValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>maxRowSelection</name>
+                <value>
+                    <numberValue>10.0</numberValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>selectionMode</name>
+                <value>
+                    <stringValue>Multi</stringValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <outputParameters>
+                <assignToReference>var_SelectedEmails</assignToReference>
+                <name>selectedRows</name>
+            </outputParameters>
+        </fields>
+        <nextOrFinishButtonLabel>Edit Selected</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <description>Confirmation screen displayed after Update_Emails successfully saves all records. The user can close the flow from here.</description>
+        <name>Screen_Success</name>
+        <label>Email Records Updated</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>txt_Success</name>
+            <fieldText>&lt;p&gt;The selected email record(s) have been updated.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Email_Records</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>The Id of the Account record page the flow is embedded on.</description>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>All ContactPointEmail records for this Account. Populated by Get_Email_Records and bound to the data table on Screen_Select.</description>
+        <name>var_AllEmails</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointEmail</objectType>
+    </variables>
+    <variables>
+        <description>Number of rows selected in the data table. Populated by Count_Selected_Emails using AssignCount. Evaluated by Decision_Route_by_Count to route to single-record or multi-record edit screen.</description>
+        <name>var_Count</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <description>Records staged for the DML update. Populated by either Assign_Apply_Single (single path) or Loop_Apply_Multi + Assign_Apply_Multi (multi path). Passed to Update_Emails as the input collection.</description>
+        <name>var_EmailsToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointEmail</objectType>
+    </variables>
+    <variables>
+        <description>Records selected in the data table. Output from dt_Emails on Screen_Select. Used by Count_Selected_Emails (to count) and Loop_Capture_Single (single path) or Loop_Apply_Multi (multi path) for downstream processing.</description>
+        <name>var_SelectedEmails</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointEmail</objectType>
+    </variables>
+    <variables>
+        <description>The single selected record. Populated from var_SelectedEmails by Assign_Capture_Single (via Loop_Capture_Single) when the single-record path is taken. Used to pre-populate fields on Screen_Edit_Single and as the target for Assign_Apply_Single before being added to var_EmailsToUpdate.</description>
+        <name>var_SingleEmail</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointEmail</objectType>
+    </variables>
+</Flow>
