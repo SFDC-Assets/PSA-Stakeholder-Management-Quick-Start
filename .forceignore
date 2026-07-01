@@ -1,0 +1,47 @@
+# List files or directories below to ignore them when running force:source:push, force:source:pull, and force:source:status
+# More information: https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_exclude_source.htm
+#
+
+package.xml
+
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# LWC Jest
+**/__tests__/**
+
+# Out-of-scope metadata
+DocGenerationQueryResult
+force-app/main/default/timelineObjectDefinitions/
+force-app/main/default/appMenus/
+force-app/main/default/externalCredentials/
+force-app/main/default/namedCredentials/
+force-app/main/default/profiles/
+force-app/main/default/timelineObjectDefinitions/
+force-app/main/default/flexipages/AdvertisingInventoryCalendar_UtilityBar.flexipage-meta.xml
+force-app/main/default/flexipages/FlowsApp_UtilityBar.flexipage-meta.xml
+force-app/main/default/flexipages/MediaAdSalesManagement_UtilityBar.flexipage-meta.xml
+force-app/main/default/layouts/PersonAccount-SMQS Person Account Layout.layout-meta.xml
+force-app/main/default/mutingpermissionsets/
+force-app/main/default/permissionsetgroups/
+force-app/main/default/permissionsets/AccessDevOpsCenterNamedCredentials.permissionset-meta.xml
+force-app/main/default/permissionsets/sf_devops_InitializeEnvironments.permissionset-meta.xml
+force-app/main/default/permissionsets/sf_devops_NamedCredentials.permissionset-meta.xml
+force-app/main/default/permissionsets/sfdcInternalInt__sfdc_nc_constraints_engine_deploy.permissionset-meta.xml
+force-app/main/default/permissionsets/sfdcInternalInt__sfdc_scrt2.permissionset-meta.xml
+force-app/main/default/relationshipGraphDefinitions/Person_Account.relationshipGraphDefinition-meta.xml
+
+# Standard Salesforce defaults — not SMQS artifacts
+force-app/main/default/objects/Contact/listViews/AllContacts.listView-meta.xml
+force-app/main/default/objects/Contact/listViews/BirthdaysThisMonth.listView-meta.xml
+force-app/main/default/objects/Contact/listViews/NewThisWeek.listView-meta.xml
+force-app/main/default/objects/Contact/webLinks/GoogleMaps.webLink-meta.xml
+force-app/main/default/objects/Contact/webLinks/GoogleSearch.webLink-meta.xml
+force-app/main/default/objects/Contact/webLinks/SendGmail.webLink-meta.xml
+force-app/main/default/objects/Contact/webLinks/YahooMaps.webLink-meta.xml
+force-app/main/default/objects/Contact/webLinks/YahooWeather.webLink-meta.xml
+force-app/main/default/objects/ContactPointEmail/listViews/All_ContactPointEmails.listView-meta.xml
+force-app/main/default/objects/ContactPointPhone/listViews/All_ContactPointPhones.listView-meta.xml
+force-app/main/default/objects/PartyRoleRelation/listViews/All_PartyRoleRelations.listView-meta.xml
+force-app/main/default/objects/PersonAccount/recordTypes/Individual.recordType-meta.xml

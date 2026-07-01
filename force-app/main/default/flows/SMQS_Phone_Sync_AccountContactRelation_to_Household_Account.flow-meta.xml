@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <assignments>
+        <description>Builds the sparse Person Account SObject with PersonHomePhone set to the Household&apos;s Phone value for the update.</description>
+        <name>Assign_PersonHomePhone_From_Household</name>
+        <label>Assign PersonHomePhone From Household</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_PersonAccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Member_Person_Account.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_PersonAccountToUpdate.PersonHomePhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Household_Account.Phone</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Member_Person_Account_Phone</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Captures the runtime fault message when the Account update fails, ending the flow gracefully rather than rolling back the triggering ACR transaction.</description>
+        <name>Assign_Fault_Message</name>
+        <label>Capture Fault and End</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_FaultMessage</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Proceeds only when the parent Account of the ACR is a Household (Is_Household__c=true). Non-household accounts (organizations) do not participate in the member phone cascade.</description>
+        <name>Is_Household</name>
+        <label>Is Household?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Is_Household</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Household_Account.Is_Household__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Member_Person_Account</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether the Person Account&apos;s PersonHomePhone differs from the Household&apos;s Phone. Only proceeds to update when there is a real difference — idempotent guard that prevents unnecessary writes and recursion.</description>
+        <name>Phone_Differs</name>
+        <label>Phone Differs?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Already Synced</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Phone_Differs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Member_Person_Account.PersonHomePhone</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>Get_Household_Account.Phone</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_PersonHomePhone_From_Household</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>AccountContactRelation AfterSave flow. Fires when IsActive, Sync_Household_Phone__c, or Roles changes and all three sync conditions are met (Roles INCLUDES Household Member, IsActive=true, Sync_Household_Phone__c=true). Copies the Household Account&apos;s Phone to the linked Person Account&apos;s PersonHomePhone when they differ. This triggers SMQS_Sync_Person_Account_to_Household_Phone, which pushes back to the household (idempotent — values will already match). The existing SMQS Phone trio reconciles the member&apos;s CPP records as a downstream side effect.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Phone Sync AccountContactRelation to Household Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Phone Sync AccountContactRelation to Household Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Loads the parent Account (Household) to check Is_Household__c and Phone fields.</description>
+        <name>Get_Household_Account</name>
+        <label>Get Household Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Is_Household</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Loads the Person Account linked to the ACR&apos;s Contact via PersonContactId. Returns Id and PersonHomePhone for the idempotency comparison.</description>
+        <name>Get_Member_Person_Account</name>
+        <label>Get Member Person Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Phone_Differs</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>PersonContactId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ContactId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Updates the Person Account&apos;s PersonHomePhone to match the Household&apos;s Phone. Fires SMQS_Sync_Person_Account_to_Household_Phone, which pushes back to the Household (idempotent no-op because values now match). The SMQS Phone trio also fires and reconciles the member&apos;s CPP records.</description>
+        <name>Update_Member_Person_Account_Phone</name>
+        <label>Update Member Person Account (Phone)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Assign_Fault_Message</targetReference>
+        </faultConnector>
+        <inputReference>var_PersonAccountToUpdate</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Household_Account</targetReference>
+        </connector>
+        <filterFormula>(ISNEW() || ISCHANGED({!$Record.IsActive}) || ISCHANGED({!$Record.Sync_Household_Phone__c}) || ISCHANGED({!$Record.Roles})) &amp;&amp; {!$Record.IsActive} &amp;&amp; {!$Record.Sync_Household_Phone__c} &amp;&amp; INCLUDES({!$Record.Roles}, &apos;Household Member&apos;)</filterFormula>
+        <object>AccountContactRelation</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Populated when the Account update faults. Allows the flow to end gracefully rather than rolling back the triggering ACR transaction.</description>
+        <name>var_FaultMessage</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Sparse Person Account SObject for the update. Id and PersonHomePhone are set in Assign_PersonHomePhone_From_Household before the update.</description>
+        <name>var_PersonAccountToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+</Flow>

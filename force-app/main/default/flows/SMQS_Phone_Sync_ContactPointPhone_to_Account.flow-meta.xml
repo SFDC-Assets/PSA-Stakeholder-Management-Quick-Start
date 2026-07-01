@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <description>Captures the runtime fault message when the Account update fails, ending the flow gracefully rather than rolling back the triggering transaction.</description>
+        <name>Assign_Fault_Message</name>
+        <label>Capture Fault and End</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_FaultMessage</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Person account, CPP Map_To__c = Home Phone: writes both Account.Phone (primary) and PersonHomePhone (typed slot).</description>
+        <name>Set_Phone_And_HomePhone</name>
+        <label>Set AccountPhone + PersonHomePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonHomePhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Person account, CPP Map_To__c = Mobile: writes both Account.Phone (primary) and PersonMobilePhone (typed slot).</description>
+        <name>Set_Phone_And_MobilePhone</name>
+        <label>Set AccountPhone + PersonMobilePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonMobilePhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Person account, CPP Map_To__c = Other Phone: writes both Account.Phone (primary) and PersonOtherPhone (typed slot).</description>
+        <name>Set_Phone_And_OtherPhone</name>
+        <label>Set AccountPhone + PersonOtherPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonOtherPhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Person account, blank Map_To__c: writes Account.Phone only. No typed field is written because there is no Map_To__c signal to route by.</description>
+        <name>Set_AccountPhone_Only</name>
+        <label>Set AccountPhone Only</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>For business accounts: only the AccountPhone is being shifted. Set Secondary_Phone__c to the previous AccountPhone value, then overwrite AccountPhone with the new primary number.</description>
+        <name>Set_Secondary_Then_AccountPhone</name>
+        <label>Set Secondary Then AccountPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Secondary_Phone__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Parent_Account.Phone</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.TelephoneNumber</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Skips processing only for business accounts where the CPP number already matches Account.Phone — no further writes are needed. Person accounts always proceed so the typed field (PersonHomePhone, PersonMobilePhone, PersonOtherPhone) can be kept in sync even when Account.Phone already holds the right value.</description>
+        <name>Already_Primary</name>
+        <label>Already Matches AccountPhone?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Is_Person_Account</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Continue</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Already_Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.TelephoneNumber</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Get_Parent_Account.Phone</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Parent_Account.IsPersonAccount</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Yes - Skip (Business)</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Branches on whether the parent Account is a person account (route by Map_To__c for typed field writes) or a business account (organization or household, Secondary_Phone__c logic only).</description>
+        <name>Is_Person_Account</name>
+        <label>Is Person Account?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Active_CPP_for_Old_AccountPhone</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Business Account</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Person_Account</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Parent_Account.IsPersonAccount</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Route_By_MapTo</targetReference>
+            </connector>
+            <label>Yes - Person Account</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Routes a person-account CPP update to the correct typed Account field based on the CPP Map_To__c value.</description>
+        <name>Route_By_MapTo</name>
+        <label>Route by Map To</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Set_AccountPhone_Only</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Blank / No Match</defaultConnectorLabel>
+        <rules>
+            <name>MapTo_HomePhone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Home Phone</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Phone_And_HomePhone</targetReference>
+            </connector>
+            <label>Home Phone</label>
+        </rules>
+        <rules>
+            <name>MapTo_Mobile</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Mobile</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Phone_And_MobilePhone</targetReference>
+            </connector>
+            <label>Mobile</label>
+        </rules>
+        <rules>
+            <name>MapTo_OtherPhone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Other Phone</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Phone_And_OtherPhone</targetReference>
+            </connector>
+            <label>Other Phone</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>For business accounts: decide whether the previous AccountPhone is still valid (active CPP found) and therefore should be moved to Secondary_Phone__c, or skipped because it has no active CPP (blank or already invalidated).</description>
+        <name>Old_AccountPhone_Still_Valid</name>
+        <label>Old AccountPhone Still Valid?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Set_AccountPhone_Only</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Skip Secondary</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Move_to_Secondary</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Active_CPP_for_Old_AccountPhone</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Secondary_Then_AccountPhone</targetReference>
+            </connector>
+            <label>Yes - Move to Secondary</label>
+        </rules>
+    </decisions>
+    <description>Syncs ContactPointPhone IsPrimary changes back to the parent Account. When IsPrimary is set to true on a CPP, this flow writes Account.Phone with the CPP number. For person accounts it also writes the typed field (PersonHomePhone, PersonMobilePhone, or PersonOtherPhone) based on the CPP Map_To__c value. For business accounts, the previous AccountPhone is moved to Secondary_Phone__c if it still has an active CPP. Business accounts are skipped when numbers already match; person accounts always proceed so typed fields stay in sync. Flow 1 re-fires on the resulting Account update and reconciles all related CPPs idempotently.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Phone Sync ContactPointPhone to Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Phone Sync ContactPointPhone to Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Validity check for business accounts: looks up an active ContactPointPhone matching the parent Account&apos;s previous AccountPhone. If found, the previous AccountPhone is treated as still valid and is moved to Secondary_Phone__c.</description>
+        <name>Get_Active_CPP_for_Old_AccountPhone</name>
+        <label>Get Active CPP for Old AccountPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Old_AccountPhone_Still_Valid</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ParentId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>TelephoneNumber</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Parent_Account.Phone</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Invalid_Reason__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ContactPointPhone</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Loads the parent Account so we can read IsPersonAccount and the current AccountPhone before overwriting it.</description>
+        <name>Get_Parent_Account</name>
+        <label>Get Parent Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Already_Primary</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Single update to the parent Account with the new AccountPhone (and Secondary_Phone__c when applicable). Flow 1 fires on this update and reconciles all related CPPs.</description>
+        <name>Update_Parent_Account</name>
+        <label>Update Parent Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Assign_Fault_Message</targetReference>
+        </faultConnector>
+        <inputReference>var_AccountToUpdate</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Parent_Account</targetReference>
+        </connector>
+        <filterFormula>{!$Record.IsPrimary} &amp;&amp; (ISNEW() || ISCHANGED({!$Record.IsPrimary}) || ISCHANGED({!$Record.Map_To__c})) &amp;&amp; NOT(ISBLANK({!$Record.TelephoneNumber}))</filterFormula>
+        <object>ContactPointPhone</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Sparse Account record built in memory and used as the input for the single Account update.</description>
+        <name>var_AccountToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+    <variables>
+        <description>Populated when the Account update faults. Allows the flow to end gracefully rather than rolling back the triggering CPP transaction.</description>
+        <name>var_FaultMessage</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

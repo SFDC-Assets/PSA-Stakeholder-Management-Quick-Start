@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <description>Sets inverse role fields on PartyRoleRelation. Assigned fields are used later by update/save processing.</description>
+        <name>Assign_Values_Based_on_Inverse_Record</name>
+        <label>Assign Values Based On Inverse Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_InverseHierarchyType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.RelatedInverseRecord.Default_Hierarchy_Type__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_InverseType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.RelatedInverseRecord.Type__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Party_Role_Relationship</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>This identifies if the Part Role Relationship was created automatically by another Party Role Relationship by the checking of the Create Inverse Role Automatic checkbox field.</description>
+        <name>Inverse_Role_Automatic_Assignment</name>
+        <label>Inverse Role Automatic Assignment</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_CreateInverseRoleAutomatically</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.RelatedInverseRecord.ShouldCreaInversRoleAuto</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_Inverse_Role_Automatically</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Checks if inverse role generation should run for PartyRoleRelation. The result is used later to control assignment and update steps.</description>
+        <name>Create_Inverse_Role_Automatically</name>
+        <label>Create Inverse Role Automatically?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_CreateInverseRoleAutomatically</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Values_Based_on_Inverse_Record</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>Determines PartyRoleRelation and determines inverse-role fields. Derived values are used later when creating or syncing inverse relationships.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>f_MapHierarchyType</name>
+        <dataType>String</dataType>
+        <expression>CASE({!var_InverseHierarchyType},
+&apos;Parent&apos;,&apos;Child&apos;,
+&apos;Child&apos;,&apos;Parent&apos;,
+&apos;Peer&apos;)</expression>
+    </formulas>
+    <interviewLabel>SMQS Party Role Relationship - Before Save Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Party Role Relationship - Before Save Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>Update_Party_Role_Relationship</name>
+        <label>Update Party Role Relationship</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Default_Hierarchy_Type__c</field>
+            <value>
+                <elementReference>f_MapHierarchyType</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Type__c</field>
+            <value>
+                <elementReference>var_InverseType</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Inverse_Role_Automatic_Assignment</targetReference>
+        </connector>
+        <object>PartyRoleRelation</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>var_CreateInverseRoleAutomatically</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>var_InverseHierarchyType</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>var_InverseType</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

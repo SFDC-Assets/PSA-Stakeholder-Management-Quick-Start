@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates which household name state applies after a member ACR is deleted. Priority: (1) a primary member still exists → Has_Primary_Member → Get_Primary_Contact; (2) any members remain but none is primary → Has_Members_No_Primary → Get_Last_Updated_Contact; (3) default → Empty Household. Contact lookup elements fetch the name before the Account update.</description>
+        <name>Determine_Household_Name_State</name>
+        <label>Determine Household Name State</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Set_Name_Empty_Household</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Members - Empty Household</defaultConnectorLabel>
+        <rules>
+            <name>Has_Primary_Member</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_PrimaryACR.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Primary_Contact</targetReference>
+            </connector>
+            <label>Has Primary Member</label>
+        </rules>
+        <rules>
+            <name>Has_Members_No_Primary</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_LastUpdatedACR.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Last_Updated_Contact</targetReference>
+            </connector>
+            <label>Has Members, No Primary</label>
+        </rules>
+    </decisions>
+    <description>Before Delete trigger on AccountContactRelation. Companion to SMQS_Household_Setup_Name_Sync_AccountContactRelationship_to_Account which handles create and update. When a household ACR is deleted, re-evaluates the parent Account name using the same 3-state logic. ACR queries exclude the record being deleted (Id != $Record.Id) because Before Delete fires while the record is still in the database. Contact name fields are fetched in a separate Get Records step per branch — cross-object field traversal is not supported in queriedFields with outputReference mode. Entry filter: parent Account Is_Household__c = true. ISCHANGED() and ISNEW() are not valid on delete triggers — entry filter uses only the household checkbox.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Produces &quot;[First] [Last]&apos;s Household&quot; from the most recently updated member remaining after the delete. Used when Has_Members_No_Primary branch is taken and var_LastUpdatedContact is populated.</description>
+        <name>f_LastUpdatedHouseholdName</name>
+        <dataType>String</dataType>
+        <expression>{!var_LastUpdatedContact.FirstName} &amp; &quot; &quot; &amp; {!var_LastUpdatedContact.LastName} &amp; &quot;&apos;s Household&quot;</expression>
+    </formulas>
+    <formulas>
+        <description>Produces &quot;[First] [Last]&apos;s Household&quot; from the remaining primary member. Used when Has_Primary_Member branch is taken and var_PrimaryContact is populated.</description>
+        <name>f_PrimaryHouseholdName</name>
+        <dataType>String</dataType>
+        <expression>{!var_PrimaryContact.FirstName} &amp; &quot; &quot; &amp; {!var_PrimaryContact.LastName} &amp; &quot;&apos;s Household&quot;</expression>
+    </formulas>
+    <interviewLabel>SMQS Household Setup Name Sync ACR Delete to Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Household Setup Name Sync ACR Delete to Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Fetches FirstName and LastName from the Contact record for the most recently updated remaining household member, using var_LastUpdatedACR.ContactId. Connector routes to Set_Name_Last_Updated_Household.</description>
+        <name>Get_Last_Updated_Contact</name>
+        <label>Get Last Updated Contact</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Set_Name_Last_Updated_Household</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>var_LastUpdatedACR.ContactId</elementReference>
+            </value>
+        </filters>
+        <object>Contact</object>
+        <outputReference>var_LastUpdatedContact</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>FirstName</queriedFields>
+        <queriedFields>LastName</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Queries the most recently updated ACR with Is_Household_Member__c = true for the parent Account after the delete, sorted LastModifiedDate DESC. Excludes the record being deleted (Id != $Record.Id) because Before Delete fires while the record is still in the DB. Returns null when no members remain. Result stored in var_LastUpdatedACR (Id and ContactId only). Connector routes to Determine_Household_Name_State.</description>
+        <name>Get_Last_Updated_Member_ACR</name>
+        <label>Get Last Updated Member ACR</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Determine_Household_Name_State</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Id</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Is_Household_Member__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>AccountContactRelation</object>
+        <outputReference>var_LastUpdatedACR</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContactId</queriedFields>
+        <sortField>LastModifiedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+    </recordLookups>
+    <recordLookups>
+        <description>Fetches FirstName and LastName from the Contact record for the remaining primary household member, using var_PrimaryACR.ContactId. Connector routes to Set_Name_Primary_Household.</description>
+        <name>Get_Primary_Contact</name>
+        <label>Get Primary Contact</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Set_Name_Primary_Household</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>var_PrimaryACR.ContactId</elementReference>
+            </value>
+        </filters>
+        <object>Contact</object>
+        <outputReference>var_PrimaryContact</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>FirstName</queriedFields>
+        <queriedFields>LastName</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Queries the single ACR with IsPrimaryMember = true and Is_Household_Member__c = true for the parent Account after the delete. Excludes the record being deleted (Id != $Record.Id) because Before Delete fires while the record is still in the DB. Returns null when no primary exists. Result stored in var_PrimaryACR (Id and ContactId only). Connector routes to Get_Last_Updated_Member_ACR.</description>
+        <name>Get_Primary_Member_ACR</name>
+        <label>Get Primary Member ACR</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Last_Updated_Member_ACR</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Id</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Is_Household_Member__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsPrimaryMember</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>AccountContactRelation</object>
+        <outputReference>var_PrimaryACR</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContactId</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Sets Account Name to &quot;Empty Household&quot; when no ACRs with Is_Household_Member__c = true remain after the delete. Reached via Determine_Household_Name_State default branch. Terminal — no successor element.</description>
+        <name>Set_Name_Empty_Household</name>
+        <label>Set Name - Empty Household</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <stringValue>Empty Household</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Sets Account Name to f_LastUpdatedHouseholdName (&quot;[First Last]&apos;s Household&quot;) from the most recently updated remaining member. Reached via Has_Members_No_Primary branch, after Get_Last_Updated_Contact fetches the name. Terminal — no successor element.</description>
+        <name>Set_Name_Last_Updated_Household</name>
+        <label>Set Name - Last Updated Member&apos;s Household</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>f_LastUpdatedHouseholdName</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Sets Account Name to f_PrimaryHouseholdName (&quot;[First Last]&apos;s Household&quot;) from the remaining primary member. Reached via Has_Primary_Member branch, after Get_Primary_Contact fetches the name. Terminal — no successor element.</description>
+        <name>Set_Name_Primary_Household</name>
+        <label>Set Name - Primary&apos;s Household</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>f_PrimaryHouseholdName</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Primary_Member_ACR</targetReference>
+        </connector>
+        <object>AccountContactRelation</object>
+        <recordTriggerType>Delete</recordTriggerType>
+        <triggerType>RecordBeforeDelete</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Output variable for Get_Last_Updated_Member_ACR. Holds the most recently updated ACR with Is_Household_Member__c = true remaining after the delete, or null if no members remain. ContactId is used by Get_Last_Updated_Contact to retrieve the name.</description>
+        <name>var_LastUpdatedACR</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AccountContactRelation</objectType>
+    </variables>
+    <variables>
+        <description>Output variable for Get_Last_Updated_Contact. Holds FirstName and LastName for the most recently updated remaining household member. Consumed by f_LastUpdatedHouseholdName.</description>
+        <name>var_LastUpdatedContact</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Contact</objectType>
+    </variables>
+    <variables>
+        <description>Output variable for Get_Primary_Member_ACR. Holds the ACR where IsPrimaryMember = true remaining after the delete, or null if none exists. ContactId is used by Get_Primary_Contact to retrieve the name.</description>
+        <name>var_PrimaryACR</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AccountContactRelation</objectType>
+    </variables>
+    <variables>
+        <description>Output variable for Get_Primary_Contact. Holds FirstName and LastName for the remaining primary household member. Consumed by f_PrimaryHouseholdName.</description>
+        <name>var_PrimaryContact</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Contact</objectType>
+    </variables>
+</Flow>

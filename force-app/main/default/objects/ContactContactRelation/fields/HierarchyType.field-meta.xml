@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HierarchyType</fullName>
+    <description>Possible values are:
+Child
+Parent
+Peer</description>
+    <inlineHelpText>Specifies the hierarchy between people that are related with this record. For example, select &apos;Parent&apos; if the person selected in the &apos;Contact&apos; field, is the parent, superior, or boss of the person selected in the &apos;Related Contact&apos; field.</inlineHelpText>
+    <trackHistory>false</trackHistory>
+</CustomField>

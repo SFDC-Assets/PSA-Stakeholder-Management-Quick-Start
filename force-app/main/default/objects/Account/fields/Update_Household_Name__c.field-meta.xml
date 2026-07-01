@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Update_Household_Name__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Will trigger an automation to review all household members and automatically update the household name.</description>
+    <inlineHelpText>Will trigger an automation to review all household members and automatically update the household name.</inlineHelpText>
+    <label>Update Household Name</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

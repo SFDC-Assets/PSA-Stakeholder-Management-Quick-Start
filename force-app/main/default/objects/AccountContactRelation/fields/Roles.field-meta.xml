@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Roles</fullName>
+    <description>Editing the Household Member option here may require editing the roles presented in the &quot;New Relationship or Affiliation&quot;.</description>
+    <type>Picklist</type>
+</CustomField>

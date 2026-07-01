@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>These metadata types represent a list of suggested roles that then can be chosen by a Salesforce admin in a flow to create.</description>
+    <label>Suggested Party Relationship Role</label>
+    <pluralLabel>Suggested Party Relationship Roles</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

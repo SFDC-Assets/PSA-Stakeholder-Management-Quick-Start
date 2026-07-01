@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <assignments>
+        <description>Sets UsageType=Inactive, IsPrimary=false, and ActiveToDate=TODAY() in-memory before the CPA record is saved. Avoids a second DML pass and the recursion it would cause.</description>
+        <name>Set_Inactive_Defaults</name>
+        <label>Set Inactive Defaults</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.UsageType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Inactive</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.IsPrimary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.ActiveToDate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Only proceeds when IsUndeliverable is being set to true on this save. Avoids firing on unrelated field changes.</description>
+        <name>Becoming_Undeliverable</name>
+        <label>Becoming Undeliverable?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Becoming_Undeliverable</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.IsUndeliverable</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Inactive_Defaults</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>ContactPointAddress BeforeSave flow. When IsUndeliverable becomes true, sets UsageType=Inactive, IsPrimary=false, and ActiveToDate=TODAY() in-memory before the record is committed. This prevents the AfterSave flow from needing a second DML pass on the same CPA. Runs before ContactPointAddress is saved on create/update so default address fields are set before commit.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Address Sync Set ContactPointAddress Defaults {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Address Sync Set ContactPointAddress Defaults</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Becoming_Undeliverable</targetReference>
+        </connector>
+        <filterFormula>ISNEW() || ISCHANGED({!$Record.IsUndeliverable})</filterFormula>
+        <object>ContactPointAddress</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

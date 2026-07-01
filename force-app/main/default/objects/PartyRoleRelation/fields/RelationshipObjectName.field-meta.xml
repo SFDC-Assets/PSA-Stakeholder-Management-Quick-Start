@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RelationshipObjectName</fullName>
+    <description>The object that&apos;s associated with the relationship. Possible values are: Account_Account_Relationship and Contact_Contact_Relationship
+
+The default value is Account_Account_Relationship.</description>
+    <inlineHelpText>Select &apos;Contact Contact Relationship&apos; if this record is to define the relationship between two individuals and &apos;Account Account Relationship&apos; if it defines the relationship between two groups (organizations or households).</inlineHelpText>
+    <trackHistory>false</trackHistory>
+</CustomField>

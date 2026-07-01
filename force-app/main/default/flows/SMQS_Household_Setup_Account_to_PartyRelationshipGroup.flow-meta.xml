@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Assign_PRG_Type_to_Household</name>
+        <label>Assign PRG Type to Household</label>
+        <locationX>578</locationX>
+        <locationY>647</locationY>
+        <assignmentItems>
+            <assignToReference>Check_for_related_Party_Relationship_Groups.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Household</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_PRG_Type</targetReference>
+        </connector>
+    </assignments>
+    <customErrors>
+        <name>Custom_Error</name>
+        <label>Custom Error</label>
+        <locationX>1282</locationX>
+        <locationY>431</locationY>
+        <customErrorMessages>
+            <errorMessage>Please forward this message to your administrator:  The flow &quot;Create Party Relationship Group from Household&quot; has had an error.  
+Triggering household: {!$Record.Id}  - {!$Record.Name}
+Fault message: {!$Flow.FaultMessage}</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <decisions>
+        <description>We need to create a PRG if none exists.  Only 1 PRG can be added to an Account, so if a PRG already exists for Household (even if it is not active), we will leave it as is.  If a PRG exists but is not a Household Type, we will update the Type.</description>
+        <name>Check_for_Party_Relationship_Groups_from_Get</name>
+        <label>Check for Party Relationship Groups from Get</label>
+        <locationX>578</locationX>
+        <locationY>539</locationY>
+        <defaultConnector>
+            <targetReference>Household_Naming_Convention</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>No_PRG</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Check_for_related_Party_Relationship_Groups</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_PRG</targetReference>
+            </connector>
+            <label>No PRG</label>
+        </rules>
+        <rules>
+            <name>Wrong_Group_Type_on_PRG</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Check_for_related_Party_Relationship_Groups.Type</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Household</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_PRG_Type_to_Household</targetReference>
+            </connector>
+            <label>Wrong Group Type on PRG</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Household_Naming_Convention</name>
+        <label>Does the Account Name match the Household Naming Convention</label>
+        <locationX>578</locationX>
+        <locationY>995</locationY>
+        <defaultConnector>
+            <targetReference>Overwrite_Household_Name</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Name is the same</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Name_Consistent</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Name</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>f_Household_Name</elementReference>
+                </rightValue>
+            </conditions>
+            <label>Yes - Name Consistent</label>
+        </rules>
+    </decisions>
+    <description>This flow runs when the status of the Account record is created and the &quot;Is Household&quot; is checked. The flow also runs when the following is changed, the Account Name, the &quot;Is Household&quot;, or Record Type.
+
+The flow finds if an active Household Party Relationship Group record exists and creates a new PRG if not. The flow will also enforce and overwrite a simple Household naming convention, using the primary member&apos;s full name e.x. John Doe&apos;s Household.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>f_Household_Name</name>
+        <dataType>String</dataType>
+        <expression>IF(!ISBLANK({!Get_Primary_Household_Member.Contact_Name__c}), {!Get_Primary_Household_Member.Contact_Name__c}&amp;&quot;&apos;s Household&quot;, IF(!ISBLANK({!Get_Last_Modified_Household_Member.Contact_Name__c}), {!Get_Last_Modified_Household_Member.Contact_Name__c}&amp;&quot;&apos;s Household&quot;, {!$Record.Name}))</expression>
+    </formulas>
+    <interviewLabel>SMQS Household Setup Account to PartyRelationshipGroup {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Household Setup Account to PartyRelationshipGroup</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Create_PRG</name>
+        <label>Create PRG</label>
+        <locationX>50</locationX>
+        <locationY>647</locationY>
+        <connector>
+            <targetReference>Household_Naming_Convention</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Custom_Error</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>AccountId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>f_Household_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Type</field>
+            <value>
+                <stringValue>Household</stringValue>
+            </value>
+        </inputAssignments>
+        <object>PartyRelationshipGroup</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <name>Check_for_related_Party_Relationship_Groups</name>
+        <label>Check for related Party Relationship Groups</label>
+        <locationX>578</locationX>
+        <locationY>323</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Primary_Household_Member</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Custom_Error</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>PartyRelationshipGroup</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Fallback when no primary member exists. Returns the most recently modified active household member to use for naming.</description>
+        <name>Get_Last_Modified_Household_Member</name>
+        <label>Get Last Modified Household Member</label>
+        <locationX>578</locationX>
+        <locationY>470</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_for_Party_Relationship_Groups_from_Get</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Is_Household_Member__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AccountContactRelation</object>
+        <sortField>LastModifiedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Get the primary active household member to ensure the Household&apos;s name is maintained.</description>
+        <name>Get_Primary_Household_Member</name>
+        <label>Get Primary Household Member</label>
+        <locationX>578</locationX>
+        <locationY>431</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Last_Modified_Household_Member</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Is_Household_Member__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsPrimaryMember</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AccountContactRelation</object>
+        <sortField>LastModifiedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Overwrite_Household_Name</name>
+        <label>Overwrite Household Name</label>
+        <locationX>666</locationX>
+        <locationY>1103</locationY>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Custom_Error</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>f_Household_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_PRG_Type</name>
+        <label>Update PRG Type</label>
+        <locationX>578</locationX>
+        <locationY>755</locationY>
+        <connector>
+            <targetReference>Household_Naming_Convention</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Custom_Error</targetReference>
+        </faultConnector>
+        <inputReference>Check_for_related_Party_Relationship_Groups</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>452</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_for_related_Party_Relationship_Groups</targetReference>
+        </connector>
+        <filterFormula>{!$Record.Is_Household__c}
+&amp;&amp; 
+( ISNEW() || ISCHANGED({!$Record.Is_Household__c}) || ISCHANGED({!$Record.RecordTypeId}) || ISCHANGED({!$Record.Name}) )</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <triggerOrder>300</triggerOrder>
+</Flow>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <assignments>
+        <description>Builds the sparse Household Account SObject for the push-up update. Sets Phone to match the person&apos;s new PersonHomePhone value.</description>
+        <name>Assign_Update_Household_Phone</name>
+        <label>Assign Update Household Phone</label>
+        <locationX>50</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>var_HouseholdToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_First_Synced_ACR_Phone.AccountId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_HouseholdToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.PersonHomePhone</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Household_Account_Phone</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>After the ACR lookup, checks whether this person has a synced Household ACR (IsNull=false) and that the ACR&apos;s Roles contains &apos;Household Member&apos;. Uses the result of Get_First_Synced_ACR_Phone — no additional query needed. The Roles check is decision-level only; it must not be placed in a SOQL filter because Contains on a multi-select picklist generates invalid SOQL at runtime.</description>
+        <name>Has_Synced_Household_For_Push_Phone</name>
+        <label>Has Synced Household For Push (Phone)?</label>
+        <locationX>182</locationX>
+        <locationY>431</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Push_To_Household_Phone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_First_Synced_ACR_Phone</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_First_Synced_ACR_Phone.Roles</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>Household Member</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Household_For_Push_Phone</targetReference>
+            </connector>
+            <label>Yes - Push Up</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether the Household Account&apos;s Phone differs from the person&apos;s new PersonHomePhone. Only fires the push-up update when there is a real difference — comparison guard that terminates the cascade loop when values converge after one round trip.</description>
+        <name>Household_Phone_Differs</name>
+        <label>Household Phone Differs?</label>
+        <locationX>50</locationX>
+        <locationY>647</locationY>
+        <defaultConnectorLabel>No - Skip</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Phone_Differs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Household_For_Push_Phone.Phone</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record.PersonHomePhone</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Update_Household_Phone</targetReference>
+            </connector>
+            <label>Yes - Update Household</label>
+        </rules>
+    </decisions>
+    <description>Account AfterSave flow gated to IsPersonAccount=true. When the person&apos;s PersonHomePhone changes, looks up the first active synced ACR (IsActive=true, Sync_Household_Phone__c=true, Roles contains Household Member) and pushes the new phone value up to the Household Account.Phone when it differs. SMQS_Sync_Business_Account_Phone_To_Members handles the cascade to other household members. Recursion terminates through comparison guards. No CPP upsert here — the existing SMQS Phone trio handles ContactPointPhone reconciliation downstream.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Phone Sync Person Account to Household Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Phone Sync Person Account to Household Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the first active synced ACR (IsActive=true, Sync_Household_Phone__c=true) for this Person Account&apos;s underlying Contact. The Household Member role check is done in Has_Synced_Household_For_Push_Phone using a decision-level Contains condition rather than a SOQL filter — SOQL Contains on a multi-select picklist generates invalid SOQL at runtime.</description>
+        <name>Get_First_Synced_ACR_Phone</name>
+        <label>Get First Synced ACR (Phone)</label>
+        <locationX>182</locationX>
+        <locationY>323</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Synced_Household_For_Push_Phone</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ContactId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.PersonContactId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Sync_Household_Phone__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AccountContactRelation</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Loads the Household Account&apos;s current Phone field for the comparison in Household_Phone_Differs.</description>
+        <name>Get_Household_For_Push_Phone</name>
+        <label>Get Household For Push (Phone)</label>
+        <locationX>50</locationX>
+        <locationY>539</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Household_Phone_Differs</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_First_Synced_ACR_Phone.AccountId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Updates the Household Account&apos;s Phone field with the person&apos;s new PersonHomePhone value. This fires SMQS_Sync_Business_Account_Phone_To_Members, which cascades to all other synced members. The Household_Phone_Differs guard ensures this only runs when there is a real difference.</description>
+        <name>Update_Household_Account_Phone</name>
+        <label>Update Household Account Phone</label>
+        <locationX>50</locationX>
+        <locationY>863</locationY>
+        <inputReference>var_HouseholdToUpdate</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>156</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_First_Synced_ACR_Phone</targetReference>
+        </connector>
+        <filterFormula>{!$Record.IsPersonAccount} &amp;&amp; (ISNEW() || ISCHANGED({!$Record.PersonHomePhone}))</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Sparse Account SObject for updating the Household Account&apos;s Phone field during the push-up step.</description>
+        <name>var_HouseholdToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+</Flow>

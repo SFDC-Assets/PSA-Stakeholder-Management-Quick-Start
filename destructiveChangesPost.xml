@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Contact_Point_Email_Record_Page</members>
+        <members>Contact_Point_Phone_Record_Page</members>
+        <members>Party_Relationship_Group_Record_Page</members>
+        <members>Stakeholder_Management_Quick_Start_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>PartyRoleRelation.smqs_New_Role</members>
+        <name>QuickAction</name>
+    </types>
+    <types>
+        <members>Person_Account</members>
+        <name>RelationshipGraphDefinition</name>
+    </types>
+    <version>59.0</version>
+</Package>

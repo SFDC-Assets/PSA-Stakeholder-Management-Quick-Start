@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>When a primary ContactPointPhone is deleted, clears Account.Phone. For Person Accounts also clears the typed field (PersonHomePhone, PersonMobilePhone, or PersonOtherPhone) based on the CPP Map_To__c value. Runs before delete so $Record fields are still accessible.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Phone Sync Delete ContactPointPhone to Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Phone Sync Delete ContactPointPhone to Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <assignments>
+        <description>Stages Account.Phone = null for Business Accounts (no typed field to clear).</description>
+        <name>Assign_Clear_Phone_Business</name>
+        <label>Clear Account.Phone (Business)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Stages Account.Phone = null and PersonHomePhone = null for Person Accounts mapped to Home Phone.</description>
+        <name>Assign_Clear_Phone_HomePhone</name>
+        <label>Clear Phone + PersonHomePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonHomePhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Stages Account.Phone = null and PersonMobilePhone = null for Person Accounts mapped to Mobile.</description>
+        <name>Assign_Clear_Phone_Mobile</name>
+        <label>Clear Phone + PersonMobilePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonMobilePhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Stages Account.Phone = null and PersonOtherPhone = null for Person Accounts mapped to Other Phone.</description>
+        <name>Assign_Clear_Phone_OtherPhone</name>
+        <label>Clear Phone + PersonOtherPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonOtherPhone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Stages Account.Phone = null for Person Accounts with no Map_To__c value. No typed field to clear.</description>
+        <name>Assign_Clear_Phone_Only</name>
+        <label>Clear Account.Phone Only</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Phone</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <recordLookups>
+        <description>Loads the parent Account to check IsPersonAccount before routing the clear logic.</description>
+        <name>Get_Account</name>
+        <label>Get Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Is_Person_Account</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>IsPersonAccount</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Writes the staged null values to the parent Account.</description>
+        <name>Update_Parent_Account</name>
+        <label>Update Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputReference>var_AccountToUpdate</inputReference>
+    </recordUpdates>
+    <decisions>
+        <description>Routes to the typed-field clear for Person Accounts, or the Account.Phone-only clear for Business/Household.</description>
+        <name>Is_Person_Account</name>
+        <label>Is Person Account?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Assign_Clear_Phone_Business</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Business / Household</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Person_Account</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Account.IsPersonAccount</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Route_By_MapTo</targetReference>
+            </connector>
+            <label>Person Account</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Routes to the correct typed Account field clear based on the deleted CPP Map_To__c value.</description>
+        <name>Route_By_MapTo</name>
+        <label>Which Typed Field?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Assign_Clear_Phone_Only</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Map To — Phone only</defaultConnectorLabel>
+        <rules>
+            <name>MapTo_HomePhone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Home Phone</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Clear_Phone_HomePhone</targetReference>
+            </connector>
+            <label>Home Phone</label>
+        </rules>
+        <rules>
+            <name>MapTo_Mobile</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Mobile</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Clear_Phone_Mobile</targetReference>
+            </connector>
+            <label>Mobile</label>
+        </rules>
+        <rules>
+            <name>MapTo_OtherPhone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Map_To__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Other Phone</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Clear_Phone_OtherPhone</targetReference>
+            </connector>
+            <label>Other Phone</label>
+        </rules>
+    </decisions>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Account</targetReference>
+        </connector>
+        <filterFormula>{!$Record.IsPrimary}</filterFormula>
+        <object>ContactPointPhone</object>
+        <recordTriggerType>Delete</recordTriggerType>
+        <triggerType>RecordBeforeDelete</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>In-memory Account record staged with null field values. Written to the database by Update_Parent_Account.</description>
+        <name>var_AccountToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+</Flow>

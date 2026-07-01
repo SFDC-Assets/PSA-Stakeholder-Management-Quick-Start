@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Formal_Salutation__c</fullName>
+    <inlineHelpText>Formal salutation as it would appear in communications in a “Dear ___” line</inlineHelpText>
+    <label>Formal Salutation</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>TextArea</type>
+</CustomField>

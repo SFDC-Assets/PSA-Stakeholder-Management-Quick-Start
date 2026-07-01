@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Coworker-Coworker CCR</label>
+    <protected>false</protected>
+    <values>
+        <field>Create_Inverse_Role_Automatically__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Default_Hierarchy_Type__c</field>
+        <value xsi:type="xsd:string">Peer</value>
+    </values>
+    <values>
+        <field>Related_Role_Name__c</field>
+        <value xsi:type="xsd:string">Coworker</value>
+    </values>
+    <values>
+        <field>Relationship_Object_Type__c</field>
+        <value xsi:type="xsd:string">Contact_Contact_Relationship</value>
+    </values>
+    <values>
+        <field>Role_Name__c</field>
+        <value xsi:type="xsd:string">Coworker</value>
+    </values>
+    <values>
+        <field>Role_Type__c</field>
+        <value xsi:type="xsd:string">Business</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IsPrimaryMember</fullName>
+    <description>Indicates whether relationship is active</description>
+    <inlineHelpText>Indicates whether the individual (Contact) is the primary contact of the group (Account). Only one individual should be designated as Primary Member per group.</inlineHelpText>
+</CustomField>

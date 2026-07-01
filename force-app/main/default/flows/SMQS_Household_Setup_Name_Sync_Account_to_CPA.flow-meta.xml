@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Assign_Household_CPA_Name</name>
+        <label>Assign Household CPA Name</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Loop_Household_CPAs.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>f_CPANameFormatted</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Household_CPAs</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Collect_Member_ContactId</name>
+        <label>Assign - Collect Member ContactId</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_MemberContactIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Collect_Member_ContactIds.ContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Collect_Member_ContactIds</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Collect_PersonAccount_ID</name>
+        <label>Assign - Collect Member PersonAccount ID</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_MemberPersonAccountIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Collect_PersonAccount_IDs.AccountId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Collect_PersonAccount_IDs</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Member_CPA_Name</name>
+        <label>Assign Member CPA Name</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Loop_Member_CPAs.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>f_CPANameFormatted</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_SingleMemberCPA</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Member_CPAs</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Assign_Member_CPA_to_Collection</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Member_CPA_to_Collection</name>
+        <label>Assign Member CPA to Collection</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_MemberCPAsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>var_SingleMemberCPA</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Member_CPAs</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Terminal fault handler. Catches any unhandled element fault and exits the flow gracefully so errors do not propagate to the calling transaction.</description>
+        <name>Fault_Done</name>
+        <label>Fault - Exit Gracefully</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_FaultOccurred</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Guards the household CPA loop. Yes → Loop_Household_CPAs. No → Get_Member_ACRs.</description>
+        <name>Has_Household_CPAs</name>
+        <label>Has Household CPAs?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Member_ACRs</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Skip to Members</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_Household_CPAs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_HouseholdCPAs</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Household_CPAs</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards the member ACR collection path. No member ACRs → exit (no CPAs to update).</description>
+        <name>Has_Member_ACRs</name>
+        <label>Has Member ACRs?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_Member_ACRs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_MemberACRs</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Collect_Member_ContactIds</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards Get_Member_Contacts. Prevents IN query with empty collection if all ACR ContactIds were null.</description>
+        <name>Has_Member_ContactIds</name>
+        <label>Has Member ContactIds?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_ContactIds</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_MemberContactIds</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Member_Contacts</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards Loop_Collect_PersonAccount_IDs. No contacts resolved → exit.</description>
+        <name>Has_Member_Contacts</name>
+        <label>Has Member Contacts?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_Member_Contacts</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_MemberContacts</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Collect_PersonAccount_IDs</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards Get_All_Member_CPAs. Prevents IN query with empty collection if all Contact.AccountId values were null.</description>
+        <name>Has_Member_PersonAccount_IDs</name>
+        <label>Has Member PersonAccount IDs?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_PA_IDs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_MemberPersonAccountIds</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_All_Member_CPAs</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards Loop_Member_CPAs. No member CPAs → exit.</description>
+        <name>Has_All_Member_CPAs</name>
+        <label>Has Member CPAs?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_All_Member_CPAs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_AllMemberCPAs</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Member_CPAs</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guards Update_Member_CPAs. No stamped CPAs → exit without DML.</description>
+        <name>Has_Member_CPAs_To_Update</name>
+        <label>Has Member CPAs To Update?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Done</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_Member_CPAs</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_MemberCPAsToUpdate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Member_CPAs</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>After Save trigger on Account (update only). When a Household Account Name changes, updates the Name field on all related ContactPointAddress records — both household-owned CPAs and member PersonAccount CPAs.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>f_CPANameFormatted</name>
+        <dataType>String</dataType>
+        <expression>{!$Record.Name} &amp; &quot; Mailing Address &quot; &amp; {!f_MonthAbbrev} &amp; &quot;, &quot; &amp; TEXT(YEAR({!$Flow.CurrentDate}))</expression>
+    </formulas>
+    <formulas>
+        <name>f_MonthAbbrev</name>
+        <dataType>String</dataType>
+        <expression>CASE(MONTH({!$Flow.CurrentDate}),
+  1, &quot;Jan&quot;,
+  2, &quot;Feb&quot;,
+  3, &quot;Mar&quot;,
+  4, &quot;Apr&quot;,
+  5, &quot;May&quot;,
+  6, &quot;Jun&quot;,
+  7, &quot;Jul&quot;,
+  8, &quot;Aug&quot;,
+  9, &quot;Sep&quot;,
+  10, &quot;Oct&quot;,
+  11, &quot;Nov&quot;,
+  &quot;Dec&quot;)</expression>
+    </formulas>
+    <interviewLabel>SMQS Household Setup Name Sync Account to CPA {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Household Setup Name Sync Account to CPA</label>
+    <loops>
+        <description>Iterates var_HouseholdCPAs, stamps f_CPANameFormatted on each. Exhausted → Update_Household_CPAs.</description>
+        <name>Loop_Household_CPAs</name>
+        <label>Loop Household CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_HouseholdCPAs</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Household_CPA_Name</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Update_Household_CPAs</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Iterates var_MemberACRs, collecting ContactId into var_MemberContactIds. Exhausted → Has_Member_ContactIds guard.</description>
+        <name>Loop_Collect_Member_ContactIds</name>
+        <label>Loop - Collect Member ContactIds</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_MemberACRs</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Collect_Member_ContactId</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Has_Member_ContactIds</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Iterates var_MemberContacts, collecting Contact.AccountId (PersonAccount ID) into var_MemberPersonAccountIds. Exhausted → Has_Member_PersonAccount_IDs guard.</description>
+        <name>Loop_Collect_PersonAccount_IDs</name>
+        <label>Loop - Collect Member PersonAccount IDs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_MemberContacts</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Collect_PersonAccount_ID</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Has_Member_PersonAccount_IDs</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Iterates var_AllMemberCPAs (all CPAs for all member PersonAccounts), stamps f_CPANameFormatted on each, and accumulates into var_MemberCPAsToUpdate. Exhausted → Has_Member_CPAs_To_Update.</description>
+        <name>Loop_Member_CPAs</name>
+        <label>Loop Member CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_AllMemberCPAs</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Member_CPA_Name</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Has_Member_CPAs_To_Update</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets all CPAs parented directly to the household Account. Fault → skip to Get_Member_ACRs (don't block member section).</description>
+        <name>Get_Household_CPAs</name>
+        <label>Get Household CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Household_CPAs</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Get_Member_ACRs</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ParentId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <object>ContactPointAddress</object>
+        <outputReference>var_HouseholdCPAs</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets all ACRs for this household where Is_Household_Member__c = true. Fault → Fault_Done.</description>
+        <name>Get_Member_ACRs</name>
+        <label>Get Member ACRs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Member_ACRs</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Done</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Is_Household_Member__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>AccountContactRelation</object>
+        <outputReference>var_MemberACRs</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContactId</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets Contacts by Id IN var_MemberContactIds to resolve Contact.AccountId (PersonAccount ID). Fault → Fault_Done.</description>
+        <name>Get_Member_Contacts</name>
+        <label>Get Member Contacts</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Member_Contacts</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Done</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>var_MemberContactIds</elementReference>
+            </value>
+        </filters>
+        <object>Contact</object>
+        <outputReference>var_MemberContacts</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>AccountId</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets all CPAs for all member PersonAccounts in one query using ParentId IN var_MemberPersonAccountIds. Fault → Fault_Done.</description>
+        <name>Get_All_Member_CPAs</name>
+        <label>Get All Member CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_All_Member_CPAs</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Done</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ParentId</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>var_MemberPersonAccountIds</elementReference>
+            </value>
+        </filters>
+        <object>ContactPointAddress</object>
+        <outputReference>var_AllMemberCPAs</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Bulk updates all household-owned CPAs. Fault → Get_Member_ACRs (continue to member section even if household update fails).</description>
+        <name>Update_Household_CPAs</name>
+        <label>Update Household CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Member_ACRs</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Get_Member_ACRs</targetReference>
+        </faultConnector>
+        <inputReference>var_HouseholdCPAs</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Bulk updates all member PersonAccount CPAs. Fault → Fault_Done.</description>
+        <name>Update_Member_CPAs</name>
+        <label>Update Member CPAs</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Done</targetReference>
+        </faultConnector>
+        <inputReference>var_MemberCPAsToUpdate</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Household_CPAs</targetReference>
+        </connector>
+        <filterFormula>ISCHANGED({!$Record.Name}) &amp;&amp; {!$Record.Is_Household__c}</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>var_AllMemberCPAs</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointAddress</objectType>
+    </variables>
+    <variables>
+        <name>var_FaultOccurred</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
+    <variables>
+        <name>var_HouseholdCPAs</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointAddress</objectType>
+    </variables>
+    <variables>
+        <name>var_MemberACRs</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AccountContactRelation</objectType>
+    </variables>
+    <variables>
+        <name>var_MemberCPAsToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointAddress</objectType>
+    </variables>
+    <variables>
+        <name>var_MemberContactIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>var_MemberContacts</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Contact</objectType>
+    </variables>
+    <variables>
+        <name>var_MemberPersonAccountIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>var_SingleMemberCPA</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactPointAddress</objectType>
+    </variables>
+</Flow>

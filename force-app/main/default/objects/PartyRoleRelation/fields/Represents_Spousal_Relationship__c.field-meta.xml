@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Represents_Spousal_Relationship__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>When selected, this will prompt a user to add a household for the spouse if none exists.</description>
+    <inlineHelpText>When selected, this will prompt a user to add a household for the spouse if none exists.</inlineHelpText>
+    <label>Represents Spousal Relationship</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

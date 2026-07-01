@@ -10,6 +10,10 @@
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "test:smoke": "npx playwright test --config=tests/playwright/playwright.config.js --project=smoke",
+    "test:docs": "npx playwright test --config=tests/playwright/playwright.config.js --project=docs",
+    "test:report": "npx playwright show-report tests/playwright/demo-report",
+    "test:record": "bash scripts/record-flow.sh",
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prettier:verify": "prettier --list-different \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "postinstall": "husky install",
@@ -17,6 +21,7 @@
   },
   "devDependencies": {
     "@lwc/eslint-plugin-lwc": "^1.1.2",
+    "@playwright/test": "^1.61.1",
     "@prettier/plugin-xml": "^2.0.1",
     "@salesforce/eslint-config-lwc": "^3.2.3",
     "@salesforce/eslint-plugin-aura": "^2.0.0",

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HierarchyType</fullName>
+    <description>Possible values are:
+Child
+Parent
+Peer</description>
+    <inlineHelpText>Specifies the hierarchy between groups that are related. For example, select parent if the group in &apos;Related Account&apos;, reports to or is included within the group in &apos;Account&apos;.
+
+For example, a group is related to another group as a parent, peer, or child.</inlineHelpText>
+    <trackHistory>false</trackHistory>
+</CustomField>

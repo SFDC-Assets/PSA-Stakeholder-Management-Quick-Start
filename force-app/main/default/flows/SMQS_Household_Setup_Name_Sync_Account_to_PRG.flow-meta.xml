@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Stamps $Record.Name onto the Name field of the current Loop_PRG_Records iteration. Loops back to Loop_PRG_Records for the next item; when exhausted, noMoreValuesConnector routes to Update_PRG_Records for a single bulk DML.</description>
+        <name>Assign_PRG_Name</name>
+        <label>Assign PRG Name</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Loop_PRG_Records.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Name</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_PRG_Records</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Guards the loop and DML. Evaluates var_PRGRecords populated by Get_PRG_Records. Yes (not null) → Loop_PRG_Records to stamp names and bulk update. No (null/empty) → flow terminates with no DML, which is correct when a household has no PRG records yet.</description>
+        <name>Has_PRG_Records</name>
+        <label>Has PRG Records?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No PRGs - Skip</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_PRG_Records</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_PRGRecords</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_PRG_Records</targetReference>
+            </connector>
+            <label>Yes - Has PRG Records</label>
+        </rules>
+    </decisions>
+    <description>After Save trigger on Account (update only). When a Household Account&apos;s Name changes (ISCHANGED(Name) AND Is_Household__c = true), mirrors the new Name onto all related PartyRelationshipGroup records where AccountId = $Record.Id. Retrieves all PRGs in one query, loops to stamp names, then performs a single bulk update. Uses a Has_PRG_Records guard to skip DML when no PRGs exist.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Household Setup Name Sync Account to PRG {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Household Setup Name Sync Account to PRG</label>
+    <loops>
+        <description>Iterates var_PRGRecords (all PRGs for this household Account). For each record, Assign_PRG_Name stamps $Record.Name onto Loop_PRG_Records.Name. When exhausted, noMoreValuesConnector routes to Update_PRG_Records for a single bulk DML.</description>
+        <name>Loop_PRG_Records</name>
+        <label>Loop PRG Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>var_PRGRecords</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_PRG_Name</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Update_PRG_Records</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Retrieves all PartyRelationshipGroup records where AccountId = $Record.Id. Returns null collection (assignNullValuesIfNoRecordsFound = true) when no PRGs exist, which causes Has_PRG_Records to skip the loop and DML. Connector routes to Has_PRG_Records. Result stored in var_PRGRecords.</description>
+        <name>Get_PRG_Records</name>
+        <label>Get PRG Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_PRG_Records</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <object>PartyRelationshipGroup</object>
+        <outputReference>var_PRGRecords</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Bulk DML update for all PRG records in var_PRGRecords after Loop_PRG_Records stamps each Name. Single DML regardless of how many PRGs exist. Terminal — no successor element.</description>
+        <name>Update_PRG_Records</name>
+        <label>Update PRG Records</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputReference>var_PRGRecords</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_PRG_Records</targetReference>
+        </connector>
+        <filterFormula>ISCHANGED({!$Record.Name}) &amp;&amp; {!$Record.Is_Household__c}</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>All PartyRelationshipGroup records where AccountId = $Record.Id. Populated by Get_PRG_Records. Iterated and name-stamped by Loop_PRG_Records, then bulk-updated by Update_PRG_Records.</description>
+        <name>var_PRGRecords</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>PartyRelationshipGroup</objectType>
+    </variables>
+</Flow>

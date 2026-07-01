@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <description>Build the in-memory Account record used for the single update: Id from $Record.ParentId, PersonEmail from $Record.EmailAddress.</description>
+        <name>Set_PersonEmail</name>
+        <label>Set PersonEmail</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_AccountToUpdate.PersonEmail</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.EmailAddress</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Parent_Account</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Skips processing when this CPE&apos;s EmailAddress already matches Account.PersonEmail. This happens on records that the sibling Account-to-CPE flow created or updated as the primary CPE (no further work needed) and prevents redundant Account updates.</description>
+        <name>Already_Primary</name>
+        <label>Already Matches PersonEmail?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Is_Person_Account</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Continue</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Already_Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.EmailAddress</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Get_Account.PersonEmail</elementReference>
+                </rightValue>
+            </conditions>
+            <label>Yes - Skip</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>PersonEmail only exists on Person Accounts. If the parent Account is a business account (organization or household), exit without updating.</description>
+        <name>Is_Person_Account</name>
+        <label>Is Person Account?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No - Business Account</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Person_Account</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Account.IsPersonAccount</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_PersonEmail</targetReference>
+            </connector>
+            <label>Yes - Person Account</label>
+        </rules>
+    </decisions>
+    <description>Syncs ContactPointEmail IsPrimary changes back to the parent Account. When IsPrimary is set to true on a CPE whose EmailAddress does not already match Account.PersonEmail, this flow updates Account.PersonEmail with the CPE&apos;s email. Person Accounts only — business accounts are filtered out via the Is Person Account decision. The sibling flow SMQS_Sync_Account_to_ContactPointEmail re-fires on the resulting Account update and reconciles all related CPEs idempotently. Runs after ContactPointEmail create/update and starts email sync back to Account.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Email Sync ContactPointEmail to Account {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Email Sync ContactPointEmail to Account</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Loads the Account so we can read IsPersonAccount and the current PersonEmail before overwriting it.</description>
+        <name>Get_Account</name>
+        <label>Get Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Already_Primary</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Single update to the parent Account with the new PersonEmail. The sibling Account-to-CPE flow fires on this update and reconciles all related CPEs.</description>
+        <name>Update_Parent_Account</name>
+        <label>Update Parent Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputReference>var_AccountToUpdate</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Account</targetReference>
+        </connector>
+        <filterFormula>{!$Record.IsPrimary} &amp;&amp; (ISNEW() || ISCHANGED({!$Record.IsPrimary})) &amp;&amp; NOT(ISBLANK({!$Record.EmailAddress}))</filterFormula>
+        <object>ContactPointEmail</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Sparse Account record built in memory and used as the input for the single Account update.</description>
+        <name>var_AccountToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+</Flow>

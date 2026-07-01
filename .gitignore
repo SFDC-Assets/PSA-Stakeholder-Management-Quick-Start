@@ -1,0 +1,130 @@
+# This file is used for Git repositories to specify intentionally untracked files that Git should ignore. 
+# If you are not using git, you can delete this file. For more information see: https://git-scm.com/docs/gitignore
+# For useful gitignore templates see: https://github.com/github/gitignore
+
+# Claude Code project memory (personal, not project artifacts)
+.claude/
+
+# Salesforce cache
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
+# LWC VSCode autocomplete
+**/lwc/jsconfig.json
+
+# LWC Jest coverage reports
+coverage/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Eslint cache
+.eslintcache
+
+# MacOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Local environment variables
+.env
+
+# Python Salesforce Functions
+**/__pycache__/
+**/.venv/
+**/venv/
+
+# VSCode workspace files
+.vscode/
+*.code-workspace
+
+# Local working directories
+.compare/
+Stakeholder Management Quick Start/
+
+# Non-stakeholder-management metadata retrieved from org but out of scope
+force-app/main/default/appMenus/
+force-app/main/default/externalCredentials/
+force-app/main/default/namedCredentials/
+force-app/main/default/profiles/
+force-app/main/default/timelineObjectDefinitions/
+force-app/main/default/flexipages/AdvertisingInventoryCalendar_UtilityBar.flexipage-meta.xml
+force-app/main/default/flexipages/FlowsApp_UtilityBar.flexipage-meta.xml
+force-app/main/default/flexipages/MediaAdSalesManagement_UtilityBar.flexipage-meta.xml
+force-app/main/default/permissionsets/AccessDevOpsCenterNamedCredentials.permissionset-meta.xml
+force-app/main/default/permissionsets/sf_devops_InitializeEnvironments.permissionset-meta.xml
+force-app/main/default/permissionsets/sf_devops_NamedCredentials.permissionset-meta.xml
+force-app/main/default/permissionsets/sfdcInternalInt__sfdc_nc_constraints_engine_deploy.permissionset-meta.xml
+force-app/main/default/permissionsets/sfdcInternalInt__sfdc_scrt2.permissionset-meta.xml
+
+# Standard (non-custom) field/object metadata retrieved from org but not SMQS customizations
+force-app/main/default/objects/Account/fields/SourceSystemIdentifier.field-meta.xml
+force-app/main/default/objects/Account/fields/Tier.field-meta.xml
+force-app/main/default/objects/Contact/fields/AssistantName.field-meta.xml
+force-app/main/default/objects/Contact/fields/AssistantPhone.field-meta.xml
+force-app/main/default/objects/Contact/fields/Birthdate.field-meta.xml
+force-app/main/default/objects/Contact/fields/BuyerAttributes.field-meta.xml
+force-app/main/default/objects/Contact/fields/ContactSource.field-meta.xml
+force-app/main/default/objects/Contact/fields/Department.field-meta.xml
+force-app/main/default/objects/Contact/fields/DepartmentGroup.field-meta.xml
+force-app/main/default/objects/Contact/fields/Description.field-meta.xml
+force-app/main/default/objects/Contact/fields/DoNotCall.field-meta.xml
+force-app/main/default/objects/Contact/fields/Email.field-meta.xml
+force-app/main/default/objects/Contact/fields/Fax.field-meta.xml
+force-app/main/default/objects/Contact/fields/GenderIdentity.field-meta.xml
+force-app/main/default/objects/Contact/fields/HasOptedOutOfEmail.field-meta.xml
+force-app/main/default/objects/Contact/fields/HasOptedOutOfFax.field-meta.xml
+force-app/main/default/objects/Contact/fields/HomePhone.field-meta.xml
+force-app/main/default/objects/Contact/fields/IndividualId.field-meta.xml
+force-app/main/default/objects/Contact/fields/Jigsaw.field-meta.xml
+force-app/main/default/objects/Contact/fields/LastCURequestDate.field-meta.xml
+force-app/main/default/objects/Contact/fields/LastCUUpdateDate.field-meta.xml
+force-app/main/default/objects/Contact/fields/LeadSource.field-meta.xml
+force-app/main/default/objects/Contact/fields/MailingAddress.field-meta.xml
+force-app/main/default/objects/Contact/fields/MaritalStatus.field-meta.xml
+force-app/main/default/objects/Contact/fields/MobilePhone.field-meta.xml
+force-app/main/default/objects/Contact/fields/Name.field-meta.xml
+force-app/main/default/objects/Contact/fields/OtherAddress.field-meta.xml
+force-app/main/default/objects/Contact/fields/OtherPhone.field-meta.xml
+force-app/main/default/objects/Contact/fields/OwnerId.field-meta.xml
+force-app/main/default/objects/Contact/fields/Phone.field-meta.xml
+force-app/main/default/objects/Contact/fields/Pronouns.field-meta.xml
+force-app/main/default/objects/Contact/fields/ReportsToId.field-meta.xml
+force-app/main/default/objects/Contact/fields/Title.field-meta.xml
+force-app/main/default/objects/Contact/fields/TitleType.field-meta.xml
+force-app/main/default/objects/Contact/listViews/
+force-app/main/default/objects/Contact/webLinks/
+force-app/main/default/objects/ContactPointEmail/fields/ActiveFromDate.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/ActiveToDate.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/BestTimeToContactEndTime.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/BestTimeToContactStartTime.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/BestTimeToContactTimezone.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/EmailAddress.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/EmailDomain.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/EmailLatestBounceDateTime.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/EmailLatestBounceReasonText.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/EmailMailBox.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/IsPrimary.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/OwnerId.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/ParentId.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/PreferenceRank.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/fields/UsageType.field-meta.xml
+force-app/main/default/objects/ContactPointEmail/listViews/
+force-app/main/default/objects/ContactPointPhone/listViews/
+force-app/main/default/workflows/
+test-results/
+tests/
+screenshots/

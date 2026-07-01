@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IsPrimaryGroup</fullName>
+    <inlineHelpText>Indicates whether the group (Account) is the primary group for the individual (Contact). An individual can have multiple primary groups, typically one household and one organization.</inlineHelpText>
+</CustomField>

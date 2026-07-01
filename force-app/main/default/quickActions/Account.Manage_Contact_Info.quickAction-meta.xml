@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Update mailing addresses, email addresses, and phone numbers for this account.</description>
+    <flowDefinition>SMQS_Screen_Manage_ContactPoints</flowDefinition>
+    <label>Manage Contact Info</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

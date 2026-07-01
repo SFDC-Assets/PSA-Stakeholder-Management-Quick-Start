@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <name>Assign_Inverse_Record</name>
+        <label>Assign Inverse Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.ContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.RelatedContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.RelatedContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.ContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.RelatedInverseRecordId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.IsActive</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.IsActive</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.HierarchyType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>f_InverseRecord_HierarchyType</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>rv_InverseContactContactRelationship.PartyRoleRelationId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>f_InverseRecord_PartyRoleRelation</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>CreateInverseRecord</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Determines if an inverse ContactContactRelation needs to be created. Branch result is used later for create/update actions.</description>
+        <name>Inverse_Record_Blank</name>
+        <label>Inverse Record Blank</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>InverseRecordBlank_Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RelatedInverseRecordId</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Inverse_Record</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>Creates and links inverse ContactContactRelation records after create. Linked inverse ids are used later by update and delete flows.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>This formula checks to see if the Party Role Relationship has an inverse role, or is singular and pulls the appropriate value for the Hierarchy Type.</description>
+        <name>f_InverseRecord_HierarchyType</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!$Record.RelatedInverseRecordId}),
+text({!$Record.PartyRoleRelation.Default_Hierarchy_Type__c}),
+text({!$Record.PartyRoleRelation.RelatedInverseRecord.Default_Hierarchy_Type__c})
+)</expression>
+    </formulas>
+    <formulas>
+        <description>This formula checks to see if the Party Role Relationship has an inverse role, or is singular.</description>
+        <name>f_InverseRecord_PartyRoleRelation</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!$Record.PartyRoleRelation.RelatedInverseRecordId}),
+{!$Record.PartyRoleRelation.Id},
+{!$Record.PartyRoleRelation.RelatedInverseRecordId}
+)</expression>
+    </formulas>
+    <interviewLabel>SMQS Contact Contact Relationship - Post Save Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Contact Contact Relationship - Post Save Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates inverse ContactContactRelation. The new record id is used later to backfill the originating record.</description>
+        <name>CreateInverseRecord</name>
+        <label>Create Inverse Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Original_Record</targetReference>
+        </connector>
+        <inputReference>rv_InverseContactContactRelationship</inputReference>
+    </recordCreates>
+    <recordUpdates>
+        <name>Update_Original_Record</name>
+        <label>Update Original  Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>RelatedInverseRecordId</field>
+            <value>
+                <elementReference>rv_InverseContactContactRelationship.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Inverse_Record_Blank</targetReference>
+        </connector>
+        <object>ContactContactRelation</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>rv_InverseContactContactRelationship</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ContactContactRelation</objectType>
+    </variables>
+</Flow>

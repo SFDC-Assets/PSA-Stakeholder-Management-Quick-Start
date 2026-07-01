@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates whether the Account&apos;s RecordType.Name contains &quot;Household&quot;. Yes → Set_Household_Checkbox (Is_Household__c = true). No (default) → Clear_Household_Checkbox (Is_Household__c = false). RecordType.Name will be null if no record type is assigned; the null path falls through to the default (clears the checkbox), which is the safe outcome for non-typed Accounts.</description>
+        <name>Is_Household_Record_Type</name>
+        <label>Is Household Record Type?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Clear_Household_Checkbox</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Non-Household RT</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Household_RT</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.Name</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>Household</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Household_Checkbox</targetReference>
+            </connector>
+            <label>Yes - Household RT</label>
+        </rules>
+    </decisions>
+    <description>Before Save trigger on Account (create and update). Enforces coupling between the Household record type and the Is_Household__c checkbox so the two fields are never out of sync. Entry filter fires only when RecordTypeId is changing (ISCHANGED on update, or ISNEW AND a record type is assigned on create). When RecordType.Name contains &quot;Household&quot;, sets Is_Household__c = true; otherwise sets it to false. In-memory field assignment — no additional DML issued.</description>
+    <environments>Default</environments>
+    <interviewLabel>SMQS Household Setup IsHousehold Enforcement {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Household Setup IsHousehold Enforcement</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>In-memory assignment — sets Is_Household__c = false on $Record when RecordType.Name does not contain &quot;Household&quot; or is null. Reached via the default path of Is_Household_Record_Type. Terminal — no successor element. Before Save; no DML issued.</description>
+        <name>Clear_Household_Checkbox</name>
+        <label>Clear Household Checkbox</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Is_Household__c</field>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <description>In-memory assignment — sets Is_Household__c = true on $Record when RecordType.Name contains &quot;Household&quot;. Reached via Yes_Household_RT branch of Is_Household_Record_Type. Terminal — no successor element. Before Save; no DML issued.</description>
+        <name>Set_Household_Checkbox</name>
+        <label>Set Household Checkbox</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Is_Household__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Is_Household_Record_Type</targetReference>
+        </connector>
+        <filterFormula>(NOT(ISNEW()) &amp;&amp; ISCHANGED({!$Record.RecordTypeId})) || (ISNEW() &amp;&amp; NOT(ISBLANK({!$Record.RecordTypeId})))</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

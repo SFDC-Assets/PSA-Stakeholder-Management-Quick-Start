@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Default_Hierarchy_Type__c</fullName>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Used to populate Hierarchy Type on Contact Contact Relationship and Account Account Relationship.
+
+Specifies the hierarchy between groups that are related. For example, select parent if the group in Related Account reports to or is included within the group in Account.
+
+For example, a group is related to another group as a parent, peer, or child.</inlineHelpText>
+    <label>Default Hierarchy Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Peer</fullName>
+                <default>true</default>
+                <label>Peer</label>
+            </value>
+            <value>
+                <fullName>Parent</fullName>
+                <default>false</default>
+                <label>Parent</label>
+            </value>
+            <value>
+                <fullName>Child</fullName>
+                <default>false</default>
+                <label>Child</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

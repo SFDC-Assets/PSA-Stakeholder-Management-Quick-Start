@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Records the normalized PersonHomePhone value as processed so subsequent fields skip it if they hold the same number.</description>
+        <name>Append_HomePhone_to_Processed</name>
+        <label>Append HomePhone to Processed</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_ProcessedPhoneValues</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Did_PersonMobilePhone_Change</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Records the normalized PersonMobilePhone value as processed so subsequent fields skip it if they hold the same number.</description>
+        <name>Append_MobilePhone_to_Processed</name>
+        <label>Append MobilePhone to Processed</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_ProcessedPhoneValues</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Did_PersonOtherPhone_Change</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Records the normalized PersonOtherPhone value as processed so subsequent fields skip it if they hold the same number.</description>
+        <name>Append_OtherPhone_to_Processed</name>
+        <label>Append OtherPhone to Processed</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_ProcessedPhoneValues</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Did_Secondary_Phone_Change</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Records the normalized AccountPhone value as processed so subsequent fields skip it if they hold the same number.</description>
+        <name>Append_Phone_to_Processed</name>
+        <label>Append AccountPhone to Processed</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_ProcessedPhoneValues</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Did_PersonHomePhone_Change</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Records the normalized Secondary_Phone__c value as processed.</description>
+        <name>Append_SecPhone_to_Processed</name>
+        <label>Append SecPhone to Processed</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>var_ProcessedPhoneValues</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Process the AccountPhone field only when its normalized value has changed (or this is a new record with a non-blank value). Comparing normalized values prevents spurious syncs when only formatting changed.</description>
+        <name>Did_AccountPhone_Change</name>
+        <label>Did AccountPhone Change?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Did_PersonHomePhone_Change</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_AccountPhone_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_Phone_Norm</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>formula_Phone_Prior_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Sync_AccountPhone</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Process the PersonHomePhone field only when its normalized value has changed. Always blank on org/household record types.</description>
+        <name>Did_PersonHomePhone_Change</name>
+        <label>Did PersonHomePhone Change?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Did_PersonMobilePhone_Change</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_PersonHomePhone_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_HomePhone_Norm</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>formula_HomePhone_Prior_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Is_HomePhone_Already_Synced</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Process the PersonMobilePhone field only when its normalized value has changed. Always blank on org/household record types.</description>
+        <name>Did_PersonMobilePhone_Change</name>
+        <label>Did PersonMobilePhone Change?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Did_PersonOtherPhone_Change</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_PersonMobilePhone_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_MobilePhone_Norm</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>formula_MobilePhone_Prior_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Is_MobilePhone_Already_Synced</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Process the PersonOtherPhone field only when its normalized value has changed. Always blank on org/household record types.</description>
+        <name>Did_PersonOtherPhone_Change</name>
+        <label>Did PersonOtherPhone Change?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Did_Secondary_Phone_Change</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_PersonOtherPhone_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_OtherPhone_Norm</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>formula_OtherPhone_Prior_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Is_OtherPhone_Already_Synced</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Process the Secondary_Phone__c field only when its normalized value has changed. Only relevant for organization and household record types.</description>
+        <name>Did_Secondary_Phone_Change</name>
+        <label>Did Secondary_Phone__c Change?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Secondary_Phone_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_SecPhone_Norm</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>formula_SecPhone_Prior_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Is_SecPhone_Already_Synced</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Skip syncing PersonHomePhone if its normalized value was already processed this execution (e.g. it matches AccountPhone which was just synced). Prevents duplicate ContactPointPhone creation.</description>
+        <name>Is_HomePhone_Already_Synced</name>
+        <label>HomePhone Already Synced?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Sync_PersonHomePhone</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Sync</defaultConnectorLabel>
+        <rules>
+            <name>Yes_HomePhone_Skip</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_ProcessedPhoneValues</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <elementReference>formula_HomePhone_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Did_PersonMobilePhone_Change</targetReference>
+            </connector>
+            <label>Yes - Skip</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Skip syncing PersonMobilePhone if its normalized value was already processed this execution. Prevents duplicate ContactPointPhone creation.</description>
+        <name>Is_MobilePhone_Already_Synced</name>
+        <label>MobilePhone Already Synced?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Sync_PersonMobilePhone</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Sync</defaultConnectorLabel>
+        <rules>
+            <name>Yes_MobilePhone_Skip</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_ProcessedPhoneValues</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <elementReference>formula_MobilePhone_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Did_PersonOtherPhone_Change</targetReference>
+            </connector>
+            <label>Yes - Skip</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Skip syncing PersonOtherPhone if its normalized value was already processed this execution. Prevents duplicate ContactPointPhone creation.</description>
+        <name>Is_OtherPhone_Already_Synced</name>
+        <label>OtherPhone Already Synced?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Sync_PersonOtherPhone</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Sync</defaultConnectorLabel>
+        <rules>
+            <name>Yes_OtherPhone_Skip</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_ProcessedPhoneValues</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <elementReference>formula_OtherPhone_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Did_Secondary_Phone_Change</targetReference>
+            </connector>
+            <label>Yes - Skip</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Skip syncing Secondary_Phone__c if its normalized value was already processed this execution. Prevents duplicate ContactPointPhone creation.</description>
+        <name>Is_SecPhone_Already_Synced</name>
+        <label>SecPhone Already Synced?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Sync_Secondary_Phone</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No - Sync</defaultConnectorLabel>
+        <rules>
+            <name>Yes_SecPhone_Skip</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_ProcessedPhoneValues</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <elementReference>formula_SecPhone_Norm</elementReference>
+                </rightValue>
+            </conditions>
+            <label>Yes - Skip</label>
+        </rules>
+    </decisions>
+    <description>Syncs phone field changes on an Account to ContactPointPhone records. Each Account phone field maps to an active ContactPointPhone matched by ParentId and TelephoneNumber. Phone values are normalized to digits-only before storage so formatting variations (e.g. &quot;(555) 123-4567&quot; vs &quot;555-123-4567&quot;) are treated as the same number. Released numbers are marked Wrong Number / Inactive (preserving history) unless still held in another phone field on the same Account. Duplicate CPP creation is prevented when multiple fields hold the same normalized number within a single save.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Digits-only version of Account.PersonHomePhone (current).</description>
+        <name>formula_HomePhone_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record.PersonHomePhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.PersonHomePhone (prior value).</description>
+        <name>formula_HomePhone_Prior_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record__Prior.PersonHomePhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.PersonMobilePhone (current).</description>
+        <name>formula_MobilePhone_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record.PersonMobilePhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.PersonMobilePhone (prior value).</description>
+        <name>formula_MobilePhone_Prior_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record__Prior.PersonMobilePhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.PersonOtherPhone (current).</description>
+        <name>formula_OtherPhone_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record.PersonOtherPhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.PersonOtherPhone (prior value).</description>
+        <name>formula_OtherPhone_Prior_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record__Prior.PersonOtherPhone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.Phone (current). Strips spaces, hyphens, parentheses, dots, and plus signs.</description>
+        <name>formula_Phone_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record.Phone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.Phone (prior value).</description>
+        <name>formula_Phone_Prior_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record__Prior.Phone}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.Secondary_Phone__c (current).</description>
+        <name>formula_SecPhone_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record.Secondary_Phone__c}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <formulas>
+        <description>Digits-only version of Account.Secondary_Phone__c (prior value).</description>
+        <name>formula_SecPhone_Prior_Norm</name>
+        <dataType>String</dataType>
+        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Record__Prior.Secondary_Phone__c}, &quot; &quot;,&quot;&quot;), &quot;-&quot;,&quot;&quot;), &quot;(&quot;,&quot;&quot;), &quot;)&quot;,&quot;&quot;), &quot;+&quot;,&quot;&quot;), &quot;.&quot;,&quot;&quot; )</expression>
+    </formulas>
+    <interviewLabel>SMQS Phone Sync Account to ContactPointPhone {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SMQS Phone Sync Account to ContactPointPhone</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Did_AccountPhone_Change</targetReference>
+        </connector>
+        <filterFormula>ISNEW() || ISCHANGED({!$Record.Phone}) || ISCHANGED({!$Record.PersonHomePhone}) || ISCHANGED({!$Record.PersonMobilePhone}) || ISCHANGED({!$Record.PersonOtherPhone}) || ISCHANGED({!$Record.Secondary_Phone__c})</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Upsert the active ContactPointPhone for the AccountPhone field. IsAccountPhoneField is true so the matched CPP becomes primary. Passes normalized digits-only values.</description>
+        <name>Sync_AccountPhone</name>
+        <label>Sync AccountPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Append_Phone_to_Processed</targetReference>
+        </connector>
+        <flowName>SMQS_Phone_ContactPointPhone_Helper_Subflow</flowName>
+        <inputAssignments>
+            <name>var_AccountId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_NewValue</name>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OldValue</name>
+            <value>
+                <elementReference>formula_Phone_Prior_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_IsAccountPhoneField</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue1</name>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue2</name>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue3</name>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue4</name>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description>Upsert the active ContactPointPhone for the PersonHomePhone field. IsAccountPhoneField is false. Passes normalized digits-only values and stamps Map_To__c = Home Phone.</description>
+        <name>Sync_PersonHomePhone</name>
+        <label>Sync PersonHomePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Append_HomePhone_to_Processed</targetReference>
+        </connector>
+        <flowName>SMQS_Phone_ContactPointPhone_Helper_Subflow</flowName>
+        <inputAssignments>
+            <name>var_AccountId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_NewValue</name>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OldValue</name>
+            <value>
+                <elementReference>formula_HomePhone_Prior_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_IsAccountPhoneField</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue1</name>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue2</name>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue3</name>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue4</name>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_MapTo</name>
+            <value>
+                <stringValue>Home Phone</stringValue>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description>Upsert the active ContactPointPhone for the PersonMobilePhone field. IsAccountPhoneField is false. Passes normalized digits-only values and stamps Map_To__c = Mobile.</description>
+        <name>Sync_PersonMobilePhone</name>
+        <label>Sync PersonMobilePhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Append_MobilePhone_to_Processed</targetReference>
+        </connector>
+        <flowName>SMQS_Phone_ContactPointPhone_Helper_Subflow</flowName>
+        <inputAssignments>
+            <name>var_AccountId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_NewValue</name>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OldValue</name>
+            <value>
+                <elementReference>formula_MobilePhone_Prior_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_IsAccountPhoneField</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue1</name>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue2</name>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue3</name>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue4</name>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_MapTo</name>
+            <value>
+                <stringValue>Mobile</stringValue>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description>Upsert the active ContactPointPhone for the PersonOtherPhone field. IsAccountPhoneField is false. Passes normalized digits-only values and stamps Map_To__c = Other Phone.</description>
+        <name>Sync_PersonOtherPhone</name>
+        <label>Sync PersonOtherPhone</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Append_OtherPhone_to_Processed</targetReference>
+        </connector>
+        <flowName>SMQS_Phone_ContactPointPhone_Helper_Subflow</flowName>
+        <inputAssignments>
+            <name>var_AccountId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_NewValue</name>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OldValue</name>
+            <value>
+                <elementReference>formula_OtherPhone_Prior_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_IsAccountPhoneField</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue1</name>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue2</name>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue3</name>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue4</name>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_MapTo</name>
+            <value>
+                <stringValue>Other Phone</stringValue>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description>Upsert the active ContactPointPhone for the Secondary_Phone__c field. IsAccountPhoneField is false. Passes normalized digits-only values.</description>
+        <name>Sync_Secondary_Phone</name>
+        <label>Sync Secondary_Phone__c</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Append_SecPhone_to_Processed</targetReference>
+        </connector>
+        <flowName>SMQS_Phone_ContactPointPhone_Helper_Subflow</flowName>
+        <inputAssignments>
+            <name>var_AccountId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_NewValue</name>
+            <value>
+                <elementReference>formula_SecPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OldValue</name>
+            <value>
+                <elementReference>formula_SecPhone_Prior_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_IsAccountPhoneField</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue1</name>
+            <value>
+                <elementReference>formula_Phone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue2</name>
+            <value>
+                <elementReference>formula_HomePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue3</name>
+            <value>
+                <elementReference>formula_MobilePhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>var_OtherValue4</name>
+            <value>
+                <elementReference>formula_OtherPhone_Norm</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <variables>
+        <description>Tracks normalized phone values already processed in this execution. Used to skip duplicate CPP creation when multiple Account phone fields hold the same number in a single save.</description>
+        <name>var_ProcessedPhoneValues</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+
+</Flow>

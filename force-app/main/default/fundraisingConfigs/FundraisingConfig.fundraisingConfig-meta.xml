@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FundraisingConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <donorMatchingMethod>Duplicate_Management_Rules</donorMatchingMethod>
+    <failedTransactionCount>1</failedTransactionCount>
+    <householdSoftCreditRole>Household Member</householdSoftCreditRole>
+    <installmentExtDayCount>1</installmentExtDayCount>
+    <isHshldSoftCrAutoCrea>false</isHshldSoftCrAutoCrea>
+    <lapsedUnpaidTrxnCount>3</lapsedUnpaidTrxnCount>
+    <masterLabel>FundraisingConfig</masterLabel>
+    <shouldClosePaidRcrCmt>false</shouldClosePaidRcrCmt>
+    <shouldCreateRcrSchdTrxn>true</shouldCreateRcrSchdTrxn>
+</FundraisingConfig>

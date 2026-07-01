@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deploy manifest: ThirdBuild → Prod
+     Excludes SMQS_Screen_Manage_ContactPoints family (fast follow)
+     Excludes Account.Manage_Contact_Info quick action (references held flow)
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SMQS_Account_Account_Relationship_Delete</members>
+        <members>SMQS_Account_Account_Relationship_Post_Save_Flow</members>
+        <members>SMQS_Address_Sync_AccountContactRelation_Household</members>
+        <members>SMQS_Address_Sync_Business_Account_to_ContactPointAddress</members>
+        <members>SMQS_Address_Sync_ContactPointAddress_to_Account</members>
+        <members>SMQS_Address_Sync_Person_Account_to_ContactPointAddress</members>
+        <members>SMQS_Address_Sync_Set_ContactPointAddress_Defaults</members>
+        <members>SMQS_Address_Sync_Upsert_ContactPointAddress</members>
+        <members>SMQS_Contact_Contact_Relationship_Delete</members>
+        <members>SMQS_Contact_Contact_Relationship_Post_Save_Flow</members>
+        <members>SMQS_Email_Sync_Account_to_ContactPointEmail</members>
+        <members>SMQS_Email_Sync_ContactPointEmail_to_Account</members>
+        <members>SMQS_Household_Setup_Account_to_PartyRelationshipGroup</members>
+        <members>SMQS_Household_Setup_IsHousehold_Enforcement</members>
+        <members>SMQS_Household_Setup_Name_Sync_ACR_Delete_to_Account</members>
+        <members>SMQS_Household_Setup_Name_Sync_AccountContactRelationship_to_Account</members>
+        <members>SMQS_Household_Setup_Name_Sync_Account_to_CPA</members>
+        <members>SMQS_Household_Setup_Name_Sync_Account_to_PRG</members>
+        <members>SMQS_Party_Role_Relationship_Before_Save_Flow</members>
+        <members>SMQS_Person_Account_Conversion_from_Contact</members>
+        <members>SMQS_Phone_ContactPointPhone_Helper_Subflow</members>
+        <members>SMQS_Phone_Sync_AccountContactRelation_to_Household_Account</members>
+        <members>SMQS_Phone_Sync_Account_to_ContactPointPhone</members>
+        <members>SMQS_Phone_Sync_ContactPointPhone_to_Account</members>
+        <members>SMQS_Phone_Sync_Household_Account_To_Person_Account</members>
+        <members>SMQS_Phone_Sync_Person_Account_to_Household_Account</members>
+        <members>SMQS_Screen_Create_Party_Role_Relationship_Setup</members>
+        <members>SMQS_Screen_Create_Relationship_or_Affiliation</members>
+        <members>SMQS_Screen_Manage_ContactPoints</members>
+        <members>SMQS_Screen_Manage_ContactPoints_Address_Subflow</members>
+        <members>SMQS_Screen_Manage_ContactPoints_Email_Subflow</members>
+        <members>SMQS_Screen_Manage_ContactPoints_Phone_Subflow</members>
+        <members>SMQS_Screen_Manage_ContactPoints_Subflow</members>
+        <members>SMQS_Screen_Manage_Household</members>
+        <members>SMQS_Screen_Manage_Household_Subflow_Create_Person_Accounts</members>
+        <members>SMQS_Screen_RelatedList_ContactPointEmail</members>
+        <members>SMQS_Screen_RelatedList_ContactPointPhone</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>SMQS_Account_Record_Page</members>
+        <members>SMQS_Account_Account_Relationship_Record_Page</members>
+        <members>SMQS_Contact_Contact_Relationship_Record_Page</members>
+        <members>SMQS_Contact_Point_Address_Record_Page</members>
+        <members>SMQS_Contact_Point_Email_Record_Page</members>
+        <members>SMQS_Contact_Point_Phone_Record_Page</members>
+        <members>SMQS_HomePageDefault</members>
+        <members>SMQS_Party_Relationship_Group_Record_Page</members>
+        <members>SMQS_Party_Role_Relationship_Record_Page</members>
+        <members>SMQS_Stakeholder_Management_Quick_Start_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>SMQS_Custom_Fields</members>
+        <members>SMQS_Person_Account_Fields</members>
+        <members>SMQS_Split_and_Merge_Households</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>SMQS_Account_Contact_Point_Addresses</members>
+        <members>SMQS_Account_Contact_Point_Emails</members>
+        <members>SMQS_Account_Contact_Point_Phones</members>
+        <members>SMQS_Account_to_Account_Relationships</members>
+        <members>SMQS_Individual_Affiliations_Account_Contact_Relationships</members>
+        <members>SMQS_Individual_Relationships_Contact_Contact_Relationships</members>
+        <members>SMQS_Party_Role_Relationships_to_Groups_Organization_and_Households</members>
+        <members>SMQS_Party_Role_Relationships_to_Individuals</members>
+        <name>ReportType</name>
+    </types>
+    <types>
+        <members>Account.Manage_Contact_Info</members>
+        <members>Account.Create_Relationship_or_Affiliation</members>
+        <members>Account.Householding_Guide</members>
+        <members>Account.Manage_Household</members>
+        <members>Account.New_Relationship_or_Affiliation</members>
+        <members>AccountAccountRelation.Mark_as_Former</members>
+        <members>AccountContactRelation.Mark_as_Former</members>
+        <members>AccountContactRelation.Mark_as_Primary</members>
+        <members>AccountContactRelation.Unmark_as_Primary</members>
+        <members>AccountContactRelation.Update_Relationship</members>
+        <members>ContactContactRelation.Mark_as_Former</members>
+        <members>ContactPointAddress.Mark_as_Primary</members>
+        <members>ContactPointAddress.Mark_as_Undeliverable</members>
+        <members>ContactPointAddress.Remove_as_Primary</members>
+        <members>ContactPointEmail.Mark_Invalid</members>
+        <members>ContactPointEmail.Mark_as_Primary</members>
+        <members>ContactPointPhone.Mark_Invalid</members>
+        <members>ContactPointPhone.Mark_as_Primary</members>
+        <members>PartyRoleRelation.New_Role</members>
+        <name>QuickAction</name>
+    </types>
+    <types>
+        <members>Account-Account Layout</members>
+        <members>Account-SMQS Account Layout</members>
+        <members>AccountAccountRelation-Account Account Relationship Layout</members>
+        <members>AccountContactRelation-Account Contact Relationship Layout</members>
+        <members>ContactContactRelation-Contact Contact Relationship Layout</members>
+        <members>ContactPointAddress-Contact Point Address Layout</members>
+        <members>ContactPointEmail-Contact Point Email Layout</members>
+        <members>ContactPointPhone-Contact Point Phone Layout</members>
+        <members>PartyRelationshipGroup-Party Relationship Group Layout</members>
+        <members>PartyRoleRelation-Party Role Relationship Layout</members>
+        <members>PersonAccount-Person Account Layout</members>
+        <members>SMQS_Party_Relationship_Role__mdt-Party Relationship Role Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Do_Not_Call</members>
+        <members>Do_Not_Mail</members>
+        <members>Email_Opt_Out</members>
+        <name>UiFormatSpecificationSet</name>
+    </types>
+    <types>
+        <members>Account.Do_Not_Mail__c</members>
+        <members>ContactPointAddress.Active__c</members>
+        <members>ContactPointAddress.Marked_For_Deletion__c</members>
+        <members>ContactPointEmail.Active__c</members>
+        <members>ContactPointEmail.Marked_For_Deletion__c</members>
+        <members>ContactPointPhone.Active__c</members>
+        <members>ContactPointPhone.Marked_For_Deletion__c</members>
+        <name>CustomField</name>
+    </types>
+    <version>66.0</version>
+</Package>
