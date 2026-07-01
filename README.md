@@ -7,7 +7,7 @@
 
 ## Description
 
-The Stakeholder Management Quick Start helps nonprofit organizations set up the necessary features to track the variety of stakeholders using best practices through automation and clearer set up steps.
+Test. The Stakeholder Management Quick Start helps nonprofit organizations set up the necessary features to track the variety of stakeholders using best practices through automation and clearer set up steps.
 
 **Individuals, Organizations, and Households**
 * Guidance and automation to ensure organization and household data quality (automatic creation of Party Relationship Groups, guidance on Account Record Types, and Household naming automation).  
